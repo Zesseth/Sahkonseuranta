@@ -1,0 +1,2 @@
+# Sahkonseuranta
+Sähkönseuranta ohjelmisto SalefishOSlle.
