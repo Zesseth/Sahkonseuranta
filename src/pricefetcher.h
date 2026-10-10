@@ -54,6 +54,8 @@ private slots:
 
 private:
     void buildBars();
+    void setLoading(bool loading);
+    void setErrorString(const QString &err);
 
     QNetworkAccessManager *m_nam;
     QNetworkReply *m_reply = nullptr;

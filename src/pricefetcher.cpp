@@ -8,6 +8,7 @@
 #include <QJsonArray>
 #include <QUrl>
 #include <QTimer>
+#include <algorithm>
 
 namespace {
 const char *kLatestPricesUrl = "https://api.porssisahko.net/v2/latest-prices.json";
@@ -152,6 +153,11 @@ void PriceFetcher::buildBars()
         }
     }
 
+    std::sort(dayPrices.begin(), dayPrices.end(), [](const QVariant &a, const QVariant &b) {
+        return a.toMap().value(QStringLiteral("start")).toDateTime()
+                < b.toMap().value(QStringLiteral("start")).toDateTime();
+    });
+
     if (n > 0) {
         m_avg = sum / n;
         m_min = dayPrices.first().toMap().value(QStringLiteral("price")).toDouble();
@@ -165,24 +171,25 @@ void PriceFetcher::buildBars()
 
     if (m_resolution == 60) {
         QVariantList hourly;
-        for (const QVariant &v : dayPrices) {
-            QVariantMap entry = v.toMap();
+        for (int i = 0; i < dayPrices.size(); ++i) {
+            QVariantMap entry = dayPrices.at(i).toMap();
             QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
-            QVariantMap existing;
-            for (const QVariant &h : hourly) {
-                QVariantMap m = h.toMap();
-                if (m.value(QStringLiteral("start")).toDateTime().time().hour() == start.time().hour()
-                        && m.value(QStringLiteral("start")).toDateTime().date() == start.date()) {
-                    existing = m;
+            int found = -1;
+            for (int h = 0; h < hourly.size(); ++h) {
+                QVariantMap m = hourly.at(h).toMap();
+                QDateTime hs = m.value(QStringLiteral("start")).toDateTime();
+                if (hs.date() == start.date() && hs.time().hour() == start.time().hour()) {
+                    found = h;
                     break;
                 }
             }
-            if (!existing.isEmpty()) {
-                double ps = existing.value(QStringLiteral("priceSum")).toDouble()
-                        + entry.value(QStringLiteral("price")).toDouble();
-                existing.insert(QStringLiteral("priceSum"), ps);
-                existing.insert(QStringLiteral("count"), existing.value(QStringLiteral("count")).toInt() + 1);
-                hourly.replace(hourly.indexOf(existing), existing);
+            if (found >= 0) {
+                QVariantMap m = hourly.at(found).toMap();
+                m.insert(QStringLiteral("priceSum"),
+                         m.value(QStringLiteral("priceSum")).toDouble()
+                         + entry.value(QStringLiteral("price")).toDouble());
+                m.insert(QStringLiteral("count"), m.value(QStringLiteral("count")).toInt() + 1);
+                hourly.replace(found, m);
             } else {
                 QVariantMap m;
                 m.insert(QStringLiteral("start"), start);
@@ -192,11 +199,13 @@ void PriceFetcher::buildBars()
             }
         }
         dayPrices.clear();
-        for (const QVariant &v : hourly) {
-            QVariantMap m = v.toMap();
+        for (int i = 0; i < hourly.size(); ++i) {
+            QVariantMap m = hourly.at(i).toMap();
             QVariantMap bar;
             bar.insert(QStringLiteral("start"), m.value(QStringLiteral("start")));
-            bar.insert(QStringLiteral("price"), m.value(QStringLiteral("priceSum")).toDouble() / m.value(QStringLiteral("count")).toDouble());
+            bar.insert(QStringLiteral("price"),
+                       m.value(QStringLiteral("priceSum")).toDouble()
+                       / m.value(QStringLiteral("count")).toDouble());
             dayPrices.append(bar);
         }
     }
