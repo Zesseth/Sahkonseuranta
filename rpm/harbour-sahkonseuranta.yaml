@@ -1,0 +1,20 @@
+Name: harbour-sahkonseuranta
+Summary: Sähkön pörssihinnan seuranta
+Version: 0.1.0
+Release: 1
+Group: Applications/System
+License: BSD-3-Clause
+SCM: https://github.com/Zesseth/Sahkonseuranta
+URL: https://github.com/Zesseth/Sahkonseuranta
+Sources:
+  - '%{name}-%{version}.tar.bz2'
+Description: |
+  Seuraa Suomen sähkön pörssihintaa 15 minuutin tai tunnin
+  tarkkuudella palkkigraafilla. Hinnat haetaan
+  porssisahko.net:n avoimesta rajapinnasta.
+Configure: none
+Builder: none
+NoFiles: 0
+Files:
+  - '%{_bindir}/%{name}'
+  - '%{_datadir}/%{name}'
