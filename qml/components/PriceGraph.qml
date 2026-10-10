@@ -8,6 +8,7 @@ Item {
     property double avgPrice: 0.0
     property double minPrice: 0.0
     property double maxPrice: 0.0
+    property int nowIndex: -1
 
     readonly property double minV: minPrice < 0
                                    ? -Math.max(Math.abs(minPrice), Math.abs(maxPrice))
@@ -20,8 +21,10 @@ Item {
         if (price < 0)
             return "#2ecc71"
         if (price <= avgPrice)
-            return Theme.highlightColor
-        return Theme.secondaryHighlightColor
+            return "#2ecc71"
+        if (avgPrice > 0 && price <= avgPrice * 2.0)
+            return "#f1c40f"
+        return "#e74c3c"
     }
 
     implicitHeight: Theme.itemSizeHuge
@@ -45,7 +48,8 @@ Item {
                        ? parent.height - graph.zeroFromBottom - height
                        : parent.height - graph.zeroFromBottom
                     height: Math.min(Math.abs(model.modelData.price) * graph.pxPerUnit, parent.height)
-                    color: graph.barColor(model.modelData.price)
+                    color: index === graph.nowIndex ? Theme.primaryColor : graph.barColor(model.modelData.price)
+                    opacity: index === graph.nowIndex ? 0.9 : 1.0
                 }
             }
         }

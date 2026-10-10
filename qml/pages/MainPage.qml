@@ -43,14 +43,37 @@ Page {
                 title: dayOffset === 0 ? qsTr("Pörssisähkö tänään") : qsTr("Pörssisähkö huomenna")
             }
 
-            Label {
+            Row {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                text: priceFetcher.hasData
-                      ? qsTr("Nyt: %1 snt/kWh").arg(priceFetcher.currentPrice.toFixed(2).replace(".", ","))
-                      : (priceFetcher.loading ? qsTr("Ladataan...") : qsTr("Ei tietoja"))
-                color: priceFetcher.hasData ? Theme.highlightColor : Theme.secondaryColor
-                font.pixelSize: Theme.fontSizeLarge
+                spacing: Theme.paddingMedium
+
+                Column {
+                    id: priceColumn
+                    spacing: Theme.paddingSmall
+
+                    Label {
+                        text: priceFetcher.hasData
+                              ? priceFetcher.currentPrice.toFixed(2).replace(".", ",") + qsTr(" snt/kWh")
+                              : (priceFetcher.loading ? qsTr("Ladataan...") : qsTr("Ei tietoja"))
+                        color: priceFetcher.hasData ? Theme.highlightColor : Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeExtraLarge
+                    }
+
+                    Label {
+                        visible: dayOffset === 0
+                        text: qsTr("Nyt")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+                }
+
+                TrafficLight {
+                    anchors.bottom: priceColumn.bottom
+                    price: priceFetcher.currentPrice
+                    avgPrice: priceFetcher.avgPrice
+                    hasData: priceFetcher.hasData && dayOffset === 0
+                }
             }
 
             Row {
@@ -64,26 +87,31 @@ Page {
                     radius: Theme.paddingSmall
                     color: priceFetcher.resolution === 15 ? Theme.highlightBackgroundColor : Theme.secondaryHighlightColor
                     opacity: priceFetcher.resolution === 15 ? 1.0 : 0.5
+
                     Label {
                         anchors.centerIn: parent
                         text: "15 min"
                         color: priceFetcher.resolution === 15 ? Theme.highlightColor : Theme.primaryColor
                         font.pixelSize: Theme.fontSizeSmall
                     }
+
                     MouseArea { anchors.fill: parent; onClicked: priceFetcher.resolution = 15 }
                 }
+
                 Rectangle {
                     width: Theme.itemSizeExtraSmall * 1.6
                     height: Theme.itemSizeSmall
                     radius: Theme.paddingSmall
                     color: priceFetcher.resolution === 60 ? Theme.highlightBackgroundColor : Theme.secondaryHighlightColor
                     opacity: priceFetcher.resolution === 60 ? 1.0 : 0.5
+
                     Label {
                         anchors.centerIn: parent
                         text: "1 h"
                         color: priceFetcher.resolution === 60 ? Theme.highlightColor : Theme.primaryColor
                         font.pixelSize: Theme.fontSizeSmall
                     }
+
                     MouseArea { anchors.fill: parent; onClicked: priceFetcher.resolution = 60 }
                 }
             }
@@ -98,19 +126,64 @@ Page {
                 avgPrice: priceFetcher.avgPrice
                 minPrice: priceFetcher.minPrice
                 maxPrice: priceFetcher.maxPrice
+                nowIndex: priceFetcher.nowIndex
             }
 
-            Label {
+            Grid {
+                id: statsGrid
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
+                columns: 3
+                spacing: Theme.paddingMedium
                 visible: priceFetcher.hasData
-                text: qsTr("Keskihinta %1 · Min %2 · Max %3 snt/kWh")
-                      .arg(priceFetcher.avgPrice.toFixed(2).replace(".", ","))
-                      .arg(priceFetcher.minPrice.toFixed(2).replace(".", ","))
-                      .arg(priceFetcher.maxPrice.toFixed(2).replace(".", ","))
-                color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeExtraSmall
-                wrapMode: Text.WordWrap
+
+                Column {
+                    width: (statsGrid.width - 2 * statsGrid.spacing) / 3
+                    spacing: 0
+
+                    Label {
+                        text: qsTr("Keskiarvo")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                    }
+                    Label {
+                        text: priceFetcher.avgPrice.toFixed(2).replace(".", ",")
+                        color: Theme.highlightColor
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+                }
+
+                Column {
+                    width: (statsGrid.width - 2 * statsGrid.spacing) / 3
+                    spacing: 0
+
+                    Label {
+                        text: qsTr("Alin")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                    }
+                    Label {
+                        text: priceFetcher.minPrice.toFixed(2).replace(".", ",")
+                        color: Theme.highlightColor
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+                }
+
+                Column {
+                    width: (statsGrid.width - 2 * statsGrid.spacing) / 3
+                    spacing: 0
+
+                    Label {
+                        text: qsTr("Ylin")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                    }
+                    Label {
+                        text: priceFetcher.maxPrice.toFixed(2).replace(".", ",")
+                        color: Theme.highlightColor
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+                }
             }
 
             Label {

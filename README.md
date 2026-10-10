@@ -6,12 +6,15 @@ tarkkuudella. Kohde: Jolla Phone (2026), julkaisu Jolla Storeen.
 
 ## Ominaisuudet (v0.1)
 
-- Pörssisähkön hinta nyt (snt/kWh, sis. ALV)
+- Pörssisähkön hinta nyt isolla (snt/kWh, sis. ALV), HattiWatti-tyylinen
+  liikennevalo: vihreä = halvaalla (≤ keskihinta tai negatiivinen),
+  keltainen = normaali (≤ 2 × keskihinta), punainen = kallis
 - 15 min tai 1 h tarkkuuden vaihto
-- Päivän hintojen palkkigraafi: keskihintaa halvemmat palkit
-  korostettuina, negatiiviset hinnat nollaviivan alapuolella
+- Päivän hintojen palkkigraafi liikennevaloväreillä (vihreä/keltainen/
+  punainen), nykyhetken palkki korostettuna, negatiiviset hinnat
+  nollaviivan alapuolella
 - Tänään / huomenna -näkymä
-- Keskihinta-, minimi- ja maksimihinta
+- Tilastorivi HattiWatin tyyliin: Keskiarvo / Alin / Ylin
 - Kansinäyttö nykyisellä hinnalla
 - Automaattinen päivitys 30 min välein; hinnat haetaan
   [porssisahko.net](https://porssisahko.net/api) v2-rajapinnasta
@@ -22,7 +25,8 @@ tarkkuudella. Kohde: Jolla Phone (2026), julkaisu Jolla Storeen.
 ```
 qml/harbour-sahkonseuranta.qml — sovellusikkuna
 qml/pages/MainPage.qml         — pääsivu (graafi, hintatiedot)
-qml/components/PriceGraph.qml — palkkigraafikomponentti
+qml/components/PriceGraph.qml — palkkigraafikomponentti (liikennevalovärit)
+qml/components/TrafficLight.qml — liikennevalo (halpa/normaali/kallis)
 qml/cover/CoverPage.qml        — kansinäyttö
 src/main.cpp                   — käynnistys, priceFetcher context-propertynä
 src/pricefetcher.{h,cpp}       — API-haku, JSON-jäsennys, aggregointi

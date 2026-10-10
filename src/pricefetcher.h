@@ -21,6 +21,7 @@ class PriceFetcher : public QObject
     Q_PROPERTY(double minPrice READ minPrice NOTIFY currentPriceChanged)
     Q_PROPERTY(double maxPrice READ maxPrice NOTIFY currentPriceChanged)
     Q_PROPERTY(int resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
+    Q_PROPERTY(int nowIndex READ nowIndex NOTIFY barsChanged)
 
 public:
     explicit PriceFetcher(QObject *parent = nullptr);
@@ -36,6 +37,7 @@ public:
     double maxPrice() const;
     int resolution() const;
     void setResolution(int res);
+    int nowIndex() const;
 
     Q_INVOKABLE void refresh();
     Q_INVOKABLE void showToday();
@@ -69,6 +71,7 @@ private:
     double m_max = 0.0;
     int m_resolution = 15;
     int m_dayOffset = 0;
+    int m_nowIndex = -1;
 };
 
 #endif

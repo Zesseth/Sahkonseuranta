@@ -35,6 +35,7 @@ double PriceFetcher::avgPrice() const { return m_avg; }
 double PriceFetcher::minPrice() const { return m_min; }
 double PriceFetcher::maxPrice() const { return m_max; }
 int PriceFetcher::resolution() const { return m_resolution; }
+int PriceFetcher::nowIndex() const { return m_nowIndex; }
 
 void PriceFetcher::setResolution(int res)
 {
@@ -130,6 +131,7 @@ void PriceFetcher::buildBars()
     m_avg = 0.0;
     m_min = 0.0;
     m_max = 0.0;
+    m_nowIndex = -1;
 
     if (m_prices.isEmpty()) {
         emit barsChanged();
@@ -221,6 +223,19 @@ void PriceFetcher::buildBars()
         }
     }
 
+    if (m_dayOffset == 0) {
+        for (int i = 0; i < dayPrices.size(); ++i) {
+            QVariantMap entry = dayPrices.at(i).toMap();
+            QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
+            QDateTime end = entry.value(QStringLiteral("end")).toDateTime();
+            if (!end.isValid())
+                end = start.addSecs(3600);
+            if (start <= now && now < end) {
+                m_nowIndex = i;
+                break;
+            }
+        }
+    }
     m_bars = dayPrices;
     emit barsChanged();
     emit currentPriceChanged();

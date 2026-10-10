@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import Sailfish.Silica 1.0
+import "../components"
 
 CoverBackground {
     id: cover
@@ -14,6 +15,7 @@ CoverBackground {
     Column {
         anchors.fill: parent
         anchors.margins: Theme.paddingMedium
+        spacing: Theme.paddingSmall
         visible: priceFetcher.hasData
 
         Label {
@@ -29,6 +31,12 @@ CoverBackground {
             color: Theme.highlightColor
             font.pixelSize: Theme.fontSizeLarge
             truncationMode: TruncationMode.Fade
+        }
+
+        TrafficLight {
+            price: priceFetcher.currentPrice
+            avgPrice: priceFetcher.avgPrice
+            hasData: priceFetcher.hasData
         }
 
         Label {

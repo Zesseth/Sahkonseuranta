@@ -4,7 +4,11 @@
 <context>
     <name>MainPage</name>
     <message>
-        <source>Pörssisähkö</source>
+        <source>Pörssisähkö tänään</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pörssisähkö huomenna</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -12,7 +16,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Nyt: %1 snt/kWh</source>
+        <source>Näytä huominen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Näytä tänään</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> snt/kWh</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ladataan...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -20,7 +36,34 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ladataan...</source>
+        <source>Nyt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keskiarvo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ylin</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TrafficLight</name>
+    <message>
+        <source>Halpa</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normaali</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Kallis</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
