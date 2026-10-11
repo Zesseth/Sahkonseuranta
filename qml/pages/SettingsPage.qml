@@ -56,7 +56,7 @@ Page {
                     anchors.centerIn: parent
 
                     Label {
-                        text: qsTr("Pallon värit")
+                        text: qsTr("Hintarajat")
                         color: Theme.secondaryHighlightColor
                         font.pixelSize: Theme.fontSizeMedium
                         font.bold: true
