@@ -7,6 +7,10 @@ Makefile*
 .qmake.stash
 *.stash
 
+# SailfishOS SDK local state (sfdk build; also self-ignores via its
+# internal .gitignore)
+.sfdk/
+
 # CMake in-source build artifacts (sfdk build)
 CMakeCache.txt
 CMakeFiles/
@@ -19,6 +23,7 @@ harbour-sahkonseuranta_autogen/
 # Qt generated
 moc_*.cpp
 *.moc
+*.qm
 tests/.moc/
 tests/.obj/
 tests/pricefetcher_test
