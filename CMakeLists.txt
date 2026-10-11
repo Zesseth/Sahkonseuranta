@@ -22,6 +22,9 @@ add_executable(harbour-sahkonseuranta
 target_include_directories(harbour-sahkonseuranta PRIVATE
     ${SAILFISH_INCLUDE_DIRS})
 
+target_compile_definitions(harbour-sahkonseuranta PRIVATE
+    APP_VERSION="${PROJECT_VERSION}")
+
 target_link_libraries(harbour-sahkonseuranta
     Qt5::Core
     Qt5::Gui

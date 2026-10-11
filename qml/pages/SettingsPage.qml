@@ -132,6 +132,44 @@ Page {
                     }
                 }
             }
+
+            // About card
+            Rectangle {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                height: aboutColumn.height + 2 * Theme.paddingLarge
+                radius: settingsPage.cardRadius
+                color: settingsPage.cardColor
+
+                Column {
+                    id: aboutColumn
+                    spacing: Theme.paddingMedium
+                    width: parent.width - 2 * Theme.paddingLarge
+                    anchors.centerIn: parent
+
+                    Label {
+                        text: qsTr("Tietoja")
+                        color: Theme.secondaryHighlightColor
+                        font.pixelSize: Theme.fontSizeMedium
+                        font.bold: true
+                    }
+
+                    Label {
+                        text: qsTr("Versio %1").arg(appVersion)
+                        color: Theme.highlightColor
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+
+                    Label {
+                        text: "<a href=\"https://github.com/Zesseth/Sahkonseuranta\">GitHub</a>"
+                        color: Theme.highlightColor
+                        linkColor: Theme.highlightColor
+                        font.pixelSize: Theme.fontSizeMedium
+                        textFormat: Text.RichText
+                        onLinkActivated: Qt.openUrlExternally(link)
+                    }
+                }
+            }
         }
     }
 }

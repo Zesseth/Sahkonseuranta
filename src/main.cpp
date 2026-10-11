@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
 
     view->rootContext()->setContextProperty(QStringLiteral("priceFetcher"), &fetcher);
     view->rootContext()->setContextProperty(QStringLiteral("appSettings"), &settings);
+    view->rootContext()->setContextProperty(QStringLiteral("appVersion"), QStringLiteral(APP_VERSION));
 
     view->setSource(SailfishApp::pathTo("qml/harbour-sahkonseuranta.qml"));
     view->show();
