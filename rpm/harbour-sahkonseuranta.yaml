@@ -1,0 +1,20 @@
+Name: harbour-sahkonseuranta
+Summary: Electricity spot price tracking
+Version: 0.1.0
+Release: 1
+Group: Applications/System
+License: BSD-3-Clause
+SCM: https://github.com/Zesseth/Sahkonseuranta
+URL: https://github.com/Zesseth/Sahkonseuranta
+Sources:
+  - '%{name}-%{version}.tar.bz2'
+Description: |
+  Track Finnish electricity spot prices with 15-minute or 1-hour
+  precision bar chart. Prices are fetched from
+  porssisahko.net open API.
+Configure: none
+Builder: none
+NoFiles: 0
+Files:
+  - '%{_bindir}/%{name}'
+  - '%{_datadir}/%{name}'

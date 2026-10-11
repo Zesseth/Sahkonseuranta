@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Icon=harbour-sahkonseuranta
+Exec=harbour-sahkonseuranta
+Name=Electricity Price Tracker
+Comment=Track Finnish electricity spot prices
+
+[X-Sailjail]
+OrganizationName=fi.zesseth
+ApplicationName=sahkonseuranta
+Permissions=Internet
