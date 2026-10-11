@@ -143,6 +143,8 @@ Store checklist (harbour rules):
 - [ ] No openrepo or third-party dependencies (yes)
 - [ ] At least 2 screenshots (capture from the emulator)
 - [ ] Description and version number in sync with `rpm/*.yaml`
+- [ ] RPM `Release:` set to `1` and `Version` bumped per the README
+      versioning scheme
 - [ ] `sfdk check` / store validation passes
 
 ## Test history

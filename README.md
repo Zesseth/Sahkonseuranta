@@ -73,6 +73,38 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for full environment setup and
 The app uses only Sailfish App / Silica / Qt5 base modules — no openrepo
 dependencies — so it satisfies the Jolla Store harbour requirements.
 
+## Versioning
+
+The app version follows `major.minor.patch` (e.g. `1.2.3`):
+
+- **major** — bumped when a GitHub milestone is complete. The first
+  milestone (Milestone 1) is the first Jolla Store release.
+- **minor** — bumped for new features.
+- **patch** — bumped for bug fixes.
+
+The version is defined in **two places that must stay in sync**:
+
+- `CMakeLists.txt` (`project(... VERSION ...)`) — feeds the version shown
+  in the app's Settings page
+- `rpm/harbour-sahkonseuranta.yaml` (`Version:`) — feeds the RPM package
+  and the Jolla Store
+
+The RPM `Release:` field (e.g. `Release: 29`) is a **packaging counter
+only**. During development it is bumped for every emulator install so
+`pkcon` accepts the same version again; users never see it. For a Jolla
+Store release it is set to `1` and left there.
+
+### Release flow (Jolla Store)
+
+1. Complete the milestone, update `Version` in both files, set
+   `Release: 1`.
+2. Tag a GitHub release (`vX.Y.Z`) matching the version.
+3. Build for the device: `sfdk config target=SailfishOS-4.6.0.13-armv7hl
+   && sfdk build`.
+4. Upload the armv7hl RPM to [Jolla Harbour](https://harbour.jolla.com).
+5. After validation the Store publishes it; user devices update
+   automatically.
+
 ## License
 
 PolyForm Noncommercial 1.0.0 — see [LICENSE](LICENSE). The source code
