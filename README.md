@@ -11,16 +11,23 @@ English.
 ## Features
 
 - Current price shown next to a **ball** whose color tells the price
-  level: green = cheap, yellow = normal, red = expensive
+  level: green = cheap (Halpa), yellow = normal (Normaali),
+  red = expensive (Kallis)
+- The current **level is named in text** and a **forecast** tells when
+  the level changes and into which level
 - The color thresholds are **user-configurable** in the settings page
-  (cents per kWh, VAT-included prices)
+  (whole cents per kWh, VAT-included prices)
 - Chart resolution (15 min / 1 h) is chosen in the settings and
   persists across sessions
 - The displayed price follows the chosen resolution: the ongoing spot
-  price at 15 min, the ongoing hour's average at 1 h
-- Daily bar chart colored with the same thresholds; current bar
-  highlighted, negative prices drawn below the zero line
-- Today / tomorrow view
+  price at 15 min, the ongoing hour's average at 1 h; the clock line
+  shows the start time of the ongoing price period
+- Scrollable bar chart of everything the API returns (today +
+  tomorrow), colored with the same thresholds: current bar marked
+  with a bright border and an axis diamond, dashed threshold lines,
+  gray grid, whole-cent y axis, whole-hour x axis
+- Today / tomorrow view (the tomorrow view scrolls the chart to
+  tomorrow midnight)
 - Stats row: average / min / max for the day
 - Cover page showing the current price
 - Automatic refresh every 30 minutes
