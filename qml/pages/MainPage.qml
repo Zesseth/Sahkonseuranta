@@ -112,42 +112,58 @@ Page {
                         font.pixelSize: Theme.fontSizeMedium
                     }
 
-                    PriceBall {
+                    // Ball on the left, level and forecast beside it
+                    Row {
                         visible: priceFetcher.hasData
-                        price: priceFetcher.displayPrice
-                        cheapThreshold: appSettings.cheapThreshold
-                        expensiveThreshold: appSettings.expensiveThreshold
-                        hasData: priceFetcher.hasData
-                    }
+                        width: parent.width
+                        spacing: Theme.paddingLarge
 
-                    Label {
-                        visible: priceFetcher.hasData && dayOffset === 0
-                        text: qsTr("Taso nyt: %1")
-                              .arg(page.levelName(page.levelOf(priceFetcher.displayPrice)))
-                        color: page.levelColor(page.levelOf(priceFetcher.displayPrice))
-                        font.pixelSize: Theme.fontSizeMedium
-                        font.bold: true
-                    }
+                        PriceBall {
+                            id: ball
+                            price: priceFetcher.displayPrice
+                            cheapThreshold: appSettings.cheapThreshold
+                            expensiveThreshold: appSettings.expensiveThreshold
+                            hasData: priceFetcher.hasData
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
 
-                    Label {
-                        visible: priceFetcher.hasData && dayOffset === 0
-                        text: priceFetcher.hasNextPrice
-                              ? qsTr("Vaihtuu %1-tasoon")
-                                    .arg(page.levelName(page.levelOf(priceFetcher.nextPrice)))
-                              : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan")
-                        color: priceFetcher.hasNextPrice
-                               ? page.levelColor(page.levelOf(priceFetcher.nextPrice))
-                               : Theme.secondaryHighlightColor
-                        font.pixelSize: Theme.fontSizeSmall
-                    }
+                        Column {
+                            width: parent.width - ball.width - parent.spacing
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: Theme.paddingSmall
 
-                    Label {
-                        visible: priceFetcher.hasData && dayOffset === 0 && priceFetcher.hasNextPrice
-                        text: qsTr("klo %1 · %2 snt/kWh")
-                              .arg(Qt.formatDateTime(priceFetcher.nextPriceStart, "HH:mm"))
-                              .arg(page.fmtPrice(priceFetcher.nextPrice))
-                        color: Theme.secondaryHighlightColor
-                        font.pixelSize: Theme.fontSizeSmall
+                            Label {
+                                visible: dayOffset === 0
+                                text: qsTr("Taso nyt: %1")
+                                      .arg(page.levelName(page.levelOf(priceFetcher.displayPrice)))
+                                color: page.levelColor(page.levelOf(priceFetcher.displayPrice))
+                                font.pixelSize: Theme.fontSizeMedium
+                                font.bold: true
+                            }
+
+                            Label {
+                                visible: dayOffset === 0
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                                text: priceFetcher.hasNextPrice
+                                      ? qsTr("Vaihtuu %1-tasoon")
+                                            .arg(page.levelName(page.levelOf(priceFetcher.nextPrice)))
+                                      : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan")
+                                color: priceFetcher.hasNextPrice
+                                       ? page.levelColor(page.levelOf(priceFetcher.nextPrice))
+                                       : Theme.secondaryHighlightColor
+                                font.pixelSize: Theme.fontSizeSmall
+                            }
+
+                            Label {
+                                visible: dayOffset === 0 && priceFetcher.hasNextPrice
+                                text: qsTr("klo %1 · %2 snt/kWh")
+                                      .arg(Qt.formatDateTime(priceFetcher.nextPriceStart, "HH:mm"))
+                                      .arg(page.fmtPrice(priceFetcher.nextPrice))
+                                color: Theme.secondaryHighlightColor
+                                font.pixelSize: Theme.fontSizeSmall
+                            }
+                        }
                     }
 
                     Label {
