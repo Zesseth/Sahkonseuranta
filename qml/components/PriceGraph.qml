@@ -27,20 +27,19 @@ Item {
     readonly property double zeroFromBottom: (0.0 - minV) * pxPerUnit
 
     // Precomputed x axis ticks: whole hours, every third hour
-    property var hourTicks: []
-    // Precomputed y axis ticks: top, middle and bottom values
-    property var yTicks: []
-
-    onBarsChanged: {
+    readonly property var hourTicks: {
         var ticks = []
         for (var i = 0; i < bars.length; ++i) {
             var st = bars[i].start
             if (st.getMinutes() === 0 && st.getHours() % 3 === 0)
                 ticks.push({ i: i, hour: st.getHours() })
         }
-        hourTicks = ticks
+        return ticks
+    }
+    // Precomputed y axis ticks: top, middle and bottom values
+    readonly property var yTicks: {
         var lo = minPrice < 0 ? minV : 0.0
-        yTicks = [maxV, (maxV + lo) / 2, lo]
+        return [maxV, (maxV + lo) / 2, lo]
     }
 
     function yFromBottom(value) {
