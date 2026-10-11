@@ -27,7 +27,12 @@ Page {
     }
 
     SilicaFlickable {
-        anchors.fill: parent
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            bottom: aboutCard.top
+        }
         contentHeight: column.height + Theme.paddingLarge
 
         VerticalScrollDecorator {}
@@ -132,43 +137,46 @@ Page {
                     }
                 }
             }
+        }
+    }
 
-            // About card
-            Rectangle {
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                height: aboutColumn.height + 2 * Theme.paddingLarge
-                radius: settingsPage.cardRadius
-                color: settingsPage.cardColor
+    // About card pinned to the bottom of the page
+    Rectangle {
+        id: aboutCard
+        x: Theme.horizontalPageMargin
+        width: parent.width - 2 * Theme.horizontalPageMargin
+        height: aboutColumn.height + 2 * Theme.paddingLarge
+        radius: settingsPage.cardRadius
+        color: settingsPage.cardColor
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: Theme.paddingMedium
 
-                Column {
-                    id: aboutColumn
-                    spacing: Theme.paddingMedium
-                    width: parent.width - 2 * Theme.paddingLarge
-                    anchors.centerIn: parent
+        Column {
+            id: aboutColumn
+            spacing: Theme.paddingMedium
+            width: parent.width - 2 * Theme.paddingLarge
+            anchors.centerIn: parent
 
-                    Label {
-                        text: qsTr("Tietoja")
-                        color: Theme.secondaryHighlightColor
-                        font.pixelSize: Theme.fontSizeMedium
-                        font.bold: true
-                    }
+            Label {
+                text: qsTr("Tietoja")
+                color: Theme.secondaryHighlightColor
+                font.pixelSize: Theme.fontSizeMedium
+                font.bold: true
+            }
 
-                    Label {
-                        text: qsTr("Versio %1").arg(appVersion)
-                        color: Theme.highlightColor
-                        font.pixelSize: Theme.fontSizeMedium
-                    }
+            Label {
+                text: qsTr("Versio %1").arg(appVersion)
+                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeMedium
+            }
 
-                    Label {
-                        text: "<a href=\"https://github.com/Zesseth/Sahkonseuranta\">GitHub</a>"
-                        color: Theme.highlightColor
-                        linkColor: Theme.highlightColor
-                        font.pixelSize: Theme.fontSizeMedium
-                        textFormat: Text.RichText
-                        onLinkActivated: Qt.openUrlExternally(link)
-                    }
-                }
+            Label {
+                text: "<a href=\"https://github.com/Zesseth/Sahkonseuranta\">GitHub</a>"
+                color: Theme.highlightColor
+                linkColor: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeMedium
+                textFormat: Text.RichText
+                onLinkActivated: Qt.openUrlExternally(link)
             }
         }
     }
