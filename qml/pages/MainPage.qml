@@ -10,7 +10,8 @@ Page {
     Component.onCompleted: priceFetcher.refresh()
 
     // Card background shared by the price card, chart card and stat cards
-    readonly property color cardColor: Theme.rgba(Theme.highlightBackgroundColor, 0.15)
+    readonly property color cardColor: Theme.rgba(Theme.highlightBackgroundColor, 0.2)
+    readonly property int cardRadius: Theme.paddingLarge
 
     SilicaFlickable {
         id: flick
@@ -55,7 +56,7 @@ Page {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 height: priceCardColumn.height + 2 * Theme.paddingLarge
-                radius: Theme.paddingSmall * 2
+                radius: page.cardRadius
                 color: page.cardColor
                 visible: (priceFetcher.hasData && dayOffset === 0) || priceFetcher.loading
 
@@ -70,7 +71,6 @@ Page {
                         cheapThreshold: appSettings.cheapThreshold
                         expensiveThreshold: appSettings.expensiveThreshold
                         hasData: priceFetcher.hasData
-                        priceFontSize: Theme.fontSizeHuge
                     }
 
                     Label {
@@ -105,14 +105,14 @@ Page {
             Rectangle {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                height: graph.height + 2 * Theme.paddingMedium
-                radius: Theme.paddingSmall * 2
+                height: graph.height + 2 * Theme.paddingLarge
+                radius: page.cardRadius
                 color: page.cardColor
                 visible: priceFetcher.hasData
 
                 PriceGraph {
                     id: graph
-                    width: parent.width - 2 * Theme.paddingMedium
+                    width: parent.width - 2 * Theme.paddingLarge
                     height: Math.max(page.height * 0.35, Theme.itemSizeHuge)
                     anchors.centerIn: parent
                     bars: priceFetcher.bars
@@ -131,30 +131,31 @@ Page {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 columns: 3
-                spacing: Theme.paddingMedium
+                spacing: Theme.paddingLarge
                 visible: priceFetcher.hasData
 
                 Rectangle {
                     width: (statsGrid.width - 2 * statsGrid.spacing) / 3
-                    height: avgColumn.height + 2 * Theme.paddingMedium
-                    radius: Theme.paddingSmall
+                    height: avgColumn.height + 2 * Theme.paddingLarge
+                    radius: page.cardRadius / 2
                     color: page.cardColor
 
                     Column {
                         id: avgColumn
                         anchors.centerIn: parent
-                        spacing: 0
+                        spacing: 2
 
                         Label {
                             text: qsTr("Keskiarvo")
                             color: Theme.secondaryHighlightColor
-                            font.pixelSize: Theme.fontSizeExtraSmall
+                            font.pixelSize: Theme.fontSizeSmall
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Label {
                             text: priceFetcher.avgPrice.toFixed(2).replace(".", ",")
                             color: Theme.highlightColor
-                            font.pixelSize: Theme.fontSizeMedium
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.bold: true
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
@@ -162,25 +163,26 @@ Page {
 
                 Rectangle {
                     width: (statsGrid.width - 2 * statsGrid.spacing) / 3
-                    height: minColumn.height + 2 * Theme.paddingMedium
-                    radius: Theme.paddingSmall
+                    height: minColumn.height + 2 * Theme.paddingLarge
+                    radius: page.cardRadius / 2
                     color: page.cardColor
 
                     Column {
                         id: minColumn
                         anchors.centerIn: parent
-                        spacing: 0
+                        spacing: 2
 
                         Label {
                             text: qsTr("Alin")
                             color: Theme.secondaryHighlightColor
-                            font.pixelSize: Theme.fontSizeExtraSmall
+                            font.pixelSize: Theme.fontSizeSmall
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Label {
                             text: priceFetcher.minPrice.toFixed(2).replace(".", ",")
                             color: Theme.highlightColor
-                            font.pixelSize: Theme.fontSizeMedium
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.bold: true
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }
@@ -188,25 +190,26 @@ Page {
 
                 Rectangle {
                     width: (statsGrid.width - 2 * statsGrid.spacing) / 3
-                    height: maxColumn.height + 2 * Theme.paddingMedium
-                    radius: Theme.paddingSmall
+                    height: maxColumn.height + 2 * Theme.paddingLarge
+                    radius: page.cardRadius / 2
                     color: page.cardColor
 
                     Column {
                         id: maxColumn
                         anchors.centerIn: parent
-                        spacing: 0
+                        spacing: 2
 
                         Label {
                             text: qsTr("Ylin")
                             color: Theme.secondaryHighlightColor
-                            font.pixelSize: Theme.fontSizeExtraSmall
+                            font.pixelSize: Theme.fontSizeSmall
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                         Label {
                             text: priceFetcher.maxPrice.toFixed(2).replace(".", ",")
                             color: Theme.highlightColor
-                            font.pixelSize: Theme.fontSizeMedium
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.bold: true
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
                     }

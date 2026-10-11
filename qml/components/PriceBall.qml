@@ -13,7 +13,7 @@ Row {
     property double cheapThreshold: 2.0
     property double expensiveThreshold: 10.0
     property bool hasData: false
-    property int priceFontSize: Theme.fontSizeExtraLarge
+    property int priceFontSize: Theme.fontSizeHuge
 
     readonly property string greenColor: "#2ecc71"
     readonly property string yellowColor: "#f1c40f"
@@ -31,7 +31,7 @@ Row {
 
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
-        width: ball.priceFontSize * 1.7
+        width: ball.priceFontSize * 1.5
         height: width
         radius: width / 2
         color: ball.stateColor
@@ -40,20 +40,30 @@ Row {
         // subtle ring so the ball reads well on any Ambience
         Rectangle {
             anchors.fill: parent
-            anchors.margins: -2
+            anchors.margins: -3
             radius: width / 2
             color: "transparent"
-            border.width: 2
-            border.color: Theme.rgba(ball.stateColor, 0.35)
+            border.width: 3
+            border.color: Theme.rgba(ball.stateColor, 0.4)
         }
     }
 
-    Label {
+    Column {
         anchors.verticalCenter: parent.verticalCenter
-        text: ball.price.toFixed(2).replace(".", ",") + qsTr(" snt/kWh")
-        color: Theme.highlightColor
-        font.pixelSize: ball.priceFontSize
-        font.bold: true
-        visible: ball.hasData
+        spacing: 2
+
+        Label {
+            text: ball.price.toFixed(2).replace(".", ",")
+            color: Theme.highlightColor
+            font.pixelSize: ball.priceFontSize
+            font.bold: true
+            visible: ball.hasData
+        }
+        Label {
+            text: qsTr("snt/kWh")
+            color: Theme.secondaryHighlightColor
+            font.pixelSize: Theme.fontSizeMedium
+            visible: ball.hasData
+        }
     }
 }
