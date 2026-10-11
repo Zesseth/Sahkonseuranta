@@ -1,38 +1,39 @@
-# Testausohjeet — Sähkönseuranta
+# Testing Guide — Sahkonseuranta
 
-Tämä dokumentti kuvaa, miten sovellus testataan ennen Jolla Storeen
-julkaisua: automaattinen testiohjelma, SDK-käännös, emulaattoritesti ja
-laitetestaus Jolla Phonella.
+This document describes how the app is tested before a Jolla Store
+release: automated unit test, SDK build, emulator testing, and device
+testing on a Jolla Phone.
 
-## 1. Yksikkötesti: PriceFetcher (ei vaadi SDK:ta)
+## 1. Unit test: PriceFetcher (no SDK needed)
 
-`src/pricefetcher.{h,cpp}` on riippumaton Silica-käyttöliittymästä, joten
-sen voi kääntää ja testata missä tahansa Qt5-ympäristössä.
+`src/pricefetcher.{h,cpp}` is independent of the Silica UI, so it can be
+compiled and tested in any Qt5 environment (Debian, Ubuntu, Windows,
+macOS).
 
-### Mitä testiohjelma tekee
+### What the test does
 
 `tests/pricefetcher_test.cpp`:
 
-1. Hakee oikean rajapinnan
-   (`https://api.porssisahko.net/v2/latest-prices.json`) verkosta
-2. Varmistaa että 15 min resoluutiossa palkit ovat
-   - peräkkäisessä aikajärjestyksessä (00:00 → 23:45)
-   - yhden paikallisen vuorokauden sisällä
-3. Vaihtaa resoluution 60 minuuttiin ja varmistaa
-   - palkkeja on täsmälleen 24
-   - ensimmäinen palkki alkaa klo 00:00
-   - tunnin hinta on sen 4 vartin keskiarvo
-4. Tulostaa hinta nyt / keskihinta / min / max tarkistettavaksi
+1. Fetches live data from
+   `https://api.porssisahko.net/v2/latest-prices.json`
+2. At 15 min resolution, verifies that the bars
+   - are in ascending chronological order (00:00 -> 23:45)
+   - span a single local day
+3. Switches to 60 min resolution and verifies
+   - there are exactly 24 bars
+   - the first bar starts at 00:00
+   - each hourly price is the average of its four quarters
+4. Prints price now / average / min / max for manual inspection
 
-### Ajo (esim. Linux + qtbase5-dev, qtdeclarative5-dev)
+### Running (e.g. Debian + qtbase5-dev, qtdeclarative5-dev)
 
 ```bash
-qmake tests/tests.pro   # tai ks. manuaalinen kääntö alla
+qmake tests/tests.pro   # or see manual build below
 make
 ./pricefetcher_test
 ```
 
-Manuaalinen kääntö ilman qmakea (esim. CI-ympäristössä):
+Manual build without qmake (e.g. in CI):
 
 ```bash
 moc src/pricefetcher.h -o moc_pricefetcher.cpp
@@ -47,106 +48,108 @@ g++ pricefetcher.o moc_pf.o test_main.o -o pricefetcher_test \
 ./pricefetcher_test
 ```
 
-### Hyväksymiskriteerit
+### Acceptance criteria
 
-- `bars=96` (15 min) ja `bars=24` (60 min) paikallispäivänä
-- Ajat nousevassa järjestyksessä, ensimmäinen 00:00, viimeinen 23:45/23:00
-- `current` on järkevä arvo (esim. 0–10 snt/kWh), `min <= avg <= max`
-- Palautus 0 (ei kaatumista, ei assertiovirhettä)
+- `bars=96` (15 min) and `bars=24` (60 min) for the local day
+- Times in ascending order, first 00:00, last 23:45/23:00
+- `current` is a plausible value (e.g. 0-10 c/kWh), `min <= avg <= max`
+- Exit code 0 (no crash, no assertion failure)
 
-Testi vaatii verkkoyhteyden. Jos rajapinta on alas, testi tulostaa
-`TIMEOUT` — ajettava uudelleen myöhemmin.
+The test needs a network connection. If the API is down, the test prints
+`TIMEOUT` — run it again later.
 
-### Mitä on jo ajettu (2026-10-10, Qt 5.15.15, Debian)
+### Test run on record (2026-10-10, Qt 5.15.15, Debian)
 
 ```
 prices fetched, bars=96
-  00:00  1.583 snt/kWh
-  00:15  1.505 snt/kWh
+  00:00  1.583 c/kWh
+  00:15  1.505 c/kWh
   ...
 current=4.533 avg=3.331 min=1.365 max=6.275 res=15
 after res switch: bars=24  first 00:00 1.677
 ```
 
-Löydetyt ja korjatut viat: ks. "Testihistoria" loppuun.
+Bugs found by this test run are listed in "Test history" below.
 
-## 2. SDK-käännös (Jolla Phone 2026, armv7hl)
+## 2. SDK build (Jolla Phone 2026, armv7hl)
 
-Koko sovellus (ml. QML) pitää kääntää SailfishOS SDK:lla:
+The full app (QML included) must be built with the SailfishOS SDK:
 
 ```bash
-sfdk config --sailfish-sdk-map <SDK-polku>
+sfdk config --sailfish-sdk-map <SDK path>
 sfdk build -d SailfishOS-4.6.0.15-armv7hl
 ```
 
-Onnistumisen kriteerit:
+Success criteria:
 
-- `moc` ja kääntö menevät läpi ilman varoituksia
-- `RPMS/noarch/` (tai `RPMS/armv7hl/`) syntyy
+- `moc` and compilation pass without warnings
+- `RPMS/noarch/` (or `RPMS/armv7hl/`) contains
   `harbour-sahkonseuranta-0.1.0-1.*.rpm`
-- `rpmlint harbour-sahkonseuranta-*.rpm` ei erroita
+- `rpmlint harbour-sahkonseuranta-*.rpm` reports no errors
 
-Vianetsintä:
+Troubleshooting:
 
-- `SailfishApp not found` → Varmista `find_package(SailfishApp)`
-  ja että buildi ajetaan sfdk-virtuaalikoneessa, ei isäntäkoneella
-- ` Sailfish.Silica` puuttuu → CMake asentaa vain `qml/`-kansion;
-  Silica tulee SDK:n imagesta eikä sitä paketoida
+- `SailfishApp not found` -> verify `find_package(SailfishApp)` and run
+  the build inside the sfdk build engine, not on the host
+- `Sailfish.Silica` missing -> CMake only installs the `qml/` directory;
+  Silica comes from the SDK image and is not bundled
 
-## 3. Emulaattoritesti (SailfishOS SDK)
-
-```bash
-sfdk emulator --armv7hl   # tai x86-virtuaalikone
-```
-
-1. Asenna RPM: `sfdk engine exec sb2 -m ... pkcon install-local <rpm>`
-2. Käynnistä sovellus launcherista ("Sähkönseuranta")
-3. Tarkista:
-   - [ ] Hinta nyt näkyy muutamassa sekunnissa
-   - [ ] Palkkigraafi piirtyy: 96 palkkia, nouseva aikajärjestys
-   - [ ] "1 h" -napista graafi tiivistyy 24 palkkiin
-   - [ ] "15 min" palauttaa 96 palkkiin
-   - [ ] PullDownMenu → "Päivitä" päivittää datan
-   - [ ] PullDownMenu → "Näytä huominen": klo 14:15 jälkeen palkit
-         näkyvät, ennen sitä tyhjä näkymä on OK
-   - [ ] Kansi (cover) näyttää nykyhinnan sovelluksen ollessa
-         taustalla; kansion klikkaus tuo sovelluksen eteen
-   - [ ] Lentotila: "Päivitä" näyttää virheilmoituksen kaatumatta
-
-## 4. Laitetestaus (Jolla Phone 2026)
+## 3. Emulator testing (SailfishOS SDK)
 
 ```bash
-sfdk device           # tai scp + pkcon install-local
+sfdk emulator --armv7hl   # or the x86 VM
 ```
 
-Laitetasolla lisäksi:
+1. Install the RPM: `sfdk engine exec sb2 -m ... pkcon install-local <rpm>`
+2. Launch the app from the launcher
+3. Check:
+   - [ ] Current price appears within a few seconds
+   - [ ] Bar chart renders: 96 bars, ascending time order
+   - [ ] "1 h" collapses the chart to 24 bars
+   - [ ] "15 min" restores 96 bars
+   - [ ] PullDownMenu -> "Päivitä" refreshes the data
+   - [ ] PullDownMenu -> "Näytä huominen": bars visible after 14:15;
+         an empty view before that is OK
+   - [ ] Cover shows the current price while the app is in the
+         background; tapping the cover brings the app forward
+   - [ ] Airplane mode: "Päivitä" shows an error instead of crashing
 
-- [ ] Launcher-ikoni näkyy oikein (86x86)
-- [ ] Graafi on luettava ulko-aurinkoisessa valossa (Ambience-värit)
-- [ ] Verkkoyhteys mobiilidata: haku ei kaadu hitaaseen verkkoon
-- [ ] Muistikäyttö pysyy vakaana 30 min automaattipäivityssyklin
-      kanssa (tarkista `systemctl` / valvonta-asetukset)
-- [ ] Sailjail: sovellus pyytää vain `Internet`-luvan
-- [ ] Ei jättänyt taustaprosessia, kun suljetaan Home-näppäimellä
+## 4. Device testing (Jolla Phone 2026)
 
-## 5. Ennen Jolla Store -julkaisua
+```bash
+sfdk device           # or scp + pkcon install-local
+```
 
-Storen tarkistuslista (harbour-säännöt):
+Additionally on hardware:
 
-- [ ] Nimi alkaa `harbour-` (kyllä)
-- [ ] Ei openrepo- tai kolmannen osapuolen riippuvuuksia (kyllä)
-- [ ] Kuvakaappaukset vähintään 2 kpl (piirrä emulaattorista)
-- [ ] Kuvaus + versionumero synkronoitu `rpm/*.yaml` kanssa
-- [ ] `sfdk check` / storen validointi menee läpi
+- [ ] Launcher icon renders correctly (86x86)
+- [ ] Chart is readable in direct sunlight (Ambience colors)
+- [ ] Mobile data: fetching survives a slow network
+- [ ] Memory stays stable across the 30-minute auto-refresh cycle
+      (check `systemctl` / watchdog settings)
+- [ ] Sailjail: the app requests only the `Internet` permission
+- [ ] No leftover background process after closing via the Home key
 
-## Testihistoria
+## 5. Before a Jolla Store release
 
-- **2026-10-10** Ensimmäinen ajettu testi paljasti kaksi aitovaa:
-  1. `setLoading`/`setErrorString` puuttuivat headerista
-     (käännösvirhe)
-  2. 60 min aggregointi kaatui `QList::replace`-assertioon
-     (map-kopio ei ollut listassa). Korjattu indeksipohjaisella
-     ryhmittelyllä.
-  3. Palkit olivat käänteisessä aikajärjestyksessä (API palauttaa
-     uusimmat ensin). Korjattu `std::sort`-lajittelulla.
-  Kaikki korjattu ja testi ajettu onnistuneesti läpi.
+Store checklist (harbour rules):
+
+- [ ] Name starts with `harbour-` (yes)
+- [ ] No openrepo or third-party dependencies (yes)
+- [ ] At least 2 screenshots (capture from the emulator)
+- [ ] Description and version number in sync with `rpm/*.yaml`
+- [ ] `sfdk check` / store validation passes
+
+## Test history
+
+- **2026-10-10** The first test run exposed three real bugs:
+  1. `setLoading`/`setErrorString` were missing from the header
+     (compile error)
+  2. 60 min aggregation hit a `QList::replace` assertion (a map copy was
+     not in the list). Fixed with index-based grouping.
+  3. Bars were in reverse time order (the API returns newest first).
+     Fixed with a `std::sort`.
+  All fixed; the test passes.
+
+- **2026-10-11** Re-run under WSL2 Debian (Qt 5.15.3): 9 checks,
+  0 failures.
