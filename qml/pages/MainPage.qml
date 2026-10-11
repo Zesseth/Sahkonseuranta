@@ -221,12 +221,12 @@ Page {
                             spacing: 2
 
                             Label {
-                                text: qsTr("Keskiarvo")
+                                text: qsTr("Alin")
                                 color: Theme.secondaryHighlightColor
                                 font.pixelSize: Theme.fontSizeSmall
                             }
                             Label {
-                                text: page.fmtPrice(priceFetcher.avgPrice)
+                                text: page.fmtPrice(priceFetcher.minPrice)
                                 color: Theme.highlightColor
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.bold: true
@@ -238,12 +238,12 @@ Page {
                             spacing: 2
 
                             Label {
-                                text: qsTr("Alin")
+                                text: qsTr("Keskiarvo")
                                 color: Theme.secondaryHighlightColor
                                 font.pixelSize: Theme.fontSizeSmall
                             }
                             Label {
-                                text: page.fmtPrice(priceFetcher.minPrice)
+                                text: page.fmtPrice(priceFetcher.avgPrice)
                                 color: Theme.highlightColor
                                 font.pixelSize: Theme.fontSizeLarge
                                 font.bold: true
