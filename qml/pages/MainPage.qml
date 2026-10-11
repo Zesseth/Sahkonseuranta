@@ -44,7 +44,7 @@ Page {
 
     // Next bar whose level differs from the current one - the price may
     // change several times inside the same level before it actually
-    // switches. Returns null when the level holds to the end of data.
+    // switches. null when the level holds to the end of the data.
     function nextLevelBar() {
         var bars = priceFetcher.allBars
         var now = priceFetcher.allNowIndex
@@ -57,6 +57,9 @@ Page {
         }
         return null
     }
+
+    // Cached per binding refresh so the labels can null-check safely
+    readonly property var nextLevel: nextLevelBar()
 
     SilicaFlickable {
         id: flick
@@ -162,21 +165,25 @@ Page {
                                 visible: dayOffset === 0
                                 width: parent.width
                                 wrapMode: Text.WordWrap
-                                text: page.nextLevelBar() !== null
+                                text: page.nextLevel !== null
                                       ? qsTr("Vaihtuu %1-tasoon")
-                                            .arg(page.levelName(page.levelOf(page.nextLevelBar().price)))
+                                            .arg(page.nextLevel !== null
+                                                 ? page.levelName(page.levelOf(page.nextLevel.price))
+                                                 : "")
                                       : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan")
-                                color: page.nextLevelBar() !== null
-                                       ? page.levelColor(page.levelOf(page.nextLevelBar().price))
+                                color: page.nextLevel !== null
+                                       ? page.levelColor(page.levelOf(page.nextLevel.price))
                                        : Theme.secondaryHighlightColor
                                 font.pixelSize: Theme.fontSizeSmall
                             }
 
                             Label {
-                                visible: dayOffset === 0 && page.nextLevelBar() !== null
-                                text: qsTr("klo %1 · %2 snt/kWh")
-                                      .arg(Qt.formatDateTime(page.nextLevelBar().start, "HH:mm"))
-                                      .arg(page.fmtPrice(page.nextLevelBar().price))
+                                visible: dayOffset === 0 && page.nextLevel !== null
+                                text: page.nextLevel !== null
+                                      ? qsTr("klo %1 · %2 snt/kWh")
+                                            .arg(Qt.formatDateTime(page.nextLevel.start, "HH:mm"))
+                                            .arg(page.fmtPrice(page.nextLevel.price))
+                                      : ""
                                 color: Theme.secondaryHighlightColor
                                 font.pixelSize: Theme.fontSizeSmall
                             }
