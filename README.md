@@ -8,7 +8,7 @@ Store.
 The user interface is in Finnish; the codebase and documentation are in
 English.
 
-## Features (v0.1)
+## Features
 
 - Current price shown next to a **ball** whose color tells the price
   level: green = cheap, yellow = normal, red = expensive
@@ -28,14 +28,17 @@ English.
   [porssisahko.net](https://porssisahko.net/api) v2 API (no key
   required, 192 quarter-hourly prices per fetch)
 
+Planned work is tracked in the repository's
+[issues](https://github.com/Zesseth/Sahkonseuranta/issues) and release
+milestones.
+
 ## Credits
 
 The Android app [HattiWatti](https://play.google.com/store/apps/details?id=com.hattiwatti.hattiwatti)
-was the original motivation for this project and inspired the
-traffic-light pricing concept. This project is **not** a port or a
-replica of HattiWatti, and it does not aim to follow HattiWatti's
-development. Sahkonseuranta is an independent SailfishOS app with its own
-scope and roadmap.
+was the original motivation for this project. This project is **not**
+a port or a replica of HattiWatti, and it does not aim to follow
+HattiWatti's development. Sahkonseuranta is an independent SailfishOS
+app with its own scope and roadmap.
 
 ## Project layout
 
@@ -67,4 +70,8 @@ dependencies — so it satisfies the Jolla Store harbour requirements.
 
 ## License
 
-BSD-3-Clause — see [LICENSE](LICENSE).
+PolyForm Noncommercial 1.0.0 — see [LICENSE](LICENSE). The source code
+is open: anyone may read, study, modify, and share it for personal,
+hobby, educational, and other noncommercial purposes. Commercial use,
+including offering the software as a hosted or managed service, is not
+permitted without a separate license from the copyright holder.
