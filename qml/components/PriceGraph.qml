@@ -51,15 +51,20 @@ Item {
     readonly property double pxPerUnit: plotArea.height / Math.max(maxV - minV, 0.001)
     readonly property double zeroFromBottom: (0.0 - minV) * pxPerUnit
 
-    // Precomputed x axis ticks: whole hours, every third hour
+    // Precomputed x axis ticks: whole hours, every third hour; the
+    // midnight tick carries the weekday abbreviation of the new day
     readonly property var hourTicks: {
         var ticks = []
         for (var i = 0; i < bars.length; ++i) {
             var st = bars[i].start
             if (st.getMinutes() === 0 && st.getHours() % 3 === 0)
-                ticks.push({ i: i, hour: st.getHours() })
+                ticks.push({ i: i, hour: st.getHours(), day: st.getHours() === 0 ? weekdayAbbr(st) : "" })
         }
         return ticks
+    }
+
+    function weekdayAbbr(date) {
+        return [qsTr("Su"), qsTr("Ma"), qsTr("Ti"), qsTr("Ke"), qsTr("To"), qsTr("Pe"), qsTr("La")][date.getDay()]
     }
 
     // Y axis ticks: every five cents below zero, every ten above
@@ -98,8 +103,13 @@ Item {
         scroll.contentX = Math.max(0, Math.min(x, scroll.contentWidth - scroll.width))
     }
 
+    // Show the current bar as the first bar of the view so the user
+    // scrolls forward from now
     function scrollToNow() {
-        scrollToIndex(nowIndex)
+        if (nowIndex < 0 || bars.length === 0)
+            return
+        var x = barX(nowIndex)
+        scroll.contentX = Math.max(0, Math.min(x, scroll.contentWidth - scroll.width))
     }
 
     // Scroll to the first bar at or after the given time
@@ -276,7 +286,9 @@ Item {
                     visible: modelData.i < graph.bars.length
                     x: graph.barX(modelData.i) + graph.barWidth / 2 - width / 2
                     y: 0
-                    text: ("0" + modelData.hour).slice(-2)
+                    text: modelData.day !== ""
+                          ? "00 " + modelData.day
+                          : ("0" + modelData.hour).slice(-2)
                     color: Theme.secondaryColor
                     font.pixelSize: Theme.fontSizeTiny
                 }
