@@ -62,6 +62,7 @@ Page {
 
             // Box 1: price level now + forecast of how long it holds
             Rectangle {
+                id: priceCard
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 height: priceBox1Column.height + 2 * Theme.paddingLarge
@@ -117,6 +118,7 @@ Page {
 
             // Box 2: price now at clock + period, and today's stats
             Rectangle {
+                id: statsCard
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 height: statsColumn.height + 2 * Theme.paddingLarge
@@ -134,9 +136,8 @@ Page {
                     Label {
                         width: parent.width
                         text: dayOffset === 0
-                              ? qsTr("Hinta on nyt klo %1 (%2)")
+                              ? qsTr("Hinta on nyt klo %1")
                                     .arg(Qt.formatDateTime(new Date(), "HH:mm"))
-                                    .arg(appSettings.resolution === 60 ? qsTr("tunnin keskiarvo") : qsTr("vartin hinta"))
                               : qsTr("Huomisen hinnat")
                         color: Theme.primaryColor
                         font.pixelSize: Theme.fontSizeMedium
@@ -200,8 +201,9 @@ Page {
                 }
             }
 
-            // Box 3: the chart
+            // Box 3: the chart fills the rest of the screen
             Rectangle {
+                id: chartCard
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 height: chartColumn.height + 2 * Theme.paddingLarge
@@ -217,7 +219,10 @@ Page {
                     spacing: Theme.paddingSmall
 
                     Label {
-                        text: qsTr("Pylväät c/kWh, katkoviivat omat rajat")
+                        id: chartCaption
+                        text: appSettings.resolution === 60
+                              ? qsTr("Tunnin keskiarvot c/kWh")
+                              : qsTr("Vartin hinnat c/kWh")
                         color: Theme.secondaryHighlightColor
                         font.pixelSize: Theme.fontSizeSmall
                     }
@@ -225,7 +230,13 @@ Page {
                     PriceGraph {
                         id: graph
                         width: parent.width
-                        height: Math.max(page.height * 0.3, Theme.itemSizeHuge)
+                        height: page.height
+                               - header.height
+                               - priceCard.height
+                               - statsCard.height
+                               - chartCaption.height
+                               - 3 * column.spacing
+                               - 5 * Theme.paddingLarge
                         bars: priceFetcher.allBars
                         avgPrice: priceFetcher.avgPrice
                         nowIndex: priceFetcher.allNowIndex
