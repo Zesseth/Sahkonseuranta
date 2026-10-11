@@ -66,7 +66,7 @@ Page {
                         id: cheapField
                         width: parent.width
                         label: qsTr("Vihreä, kun hinta on korkeintaan (snt/kWh)")
-                        placeholderText: "2"
+                        placeholderText: "5"
                         text: fmt(appSettings.cheapThreshold)
                         inputMethodHints: Qt.ImhDigitsOnly
                         EnterKey.iconSource: "image://theme/icon-m-enter-next"

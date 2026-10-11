@@ -37,7 +37,7 @@ private:
 
     QString m_organization;
     QString m_application;
-    double m_cheap = 2.0;      // c/kWh, green at or below this
+    double m_cheap = 5.0;      // c/kWh, green at or below this
     double m_expensive = 10.0; // c/kWh, red at or above this
     int m_resolution = 15;     // minutes, 15 or 60
 };

@@ -26,7 +26,7 @@ the Silica UI, so they can be compiled and tested in any Qt5 environment
 
 ### Settings test (`tests/settings_test.cpp`)
 
-1. Verifies the default thresholds (2.0 and 10.0 c/kWh) and default
+1. Verifies the default thresholds (5.0 and 10.0 c/kWh) and default
    resolution (15 min)
 2. Verifies that the expensive threshold is clamped to the cheap
    threshold and that negative values are rejected

@@ -76,7 +76,7 @@ void Settings::setResolution(int res)
 void Settings::load()
 {
     QSettings s(m_organization, m_application);
-    m_cheap = s.value(QString::fromLatin1(kKeyCheap), 2.0).toDouble();
+    m_cheap = s.value(QString::fromLatin1(kKeyCheap), 5.0).toDouble();
     if (m_cheap < 0.0)
         m_cheap = 0.0;
     m_cheap = qRound(m_cheap);

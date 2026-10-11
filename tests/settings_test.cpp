@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     QSettings(org, appl).clear();
 
     Settings s(nullptr, org, appl);
-    check(s.cheapThreshold() == 2.0, "default cheap threshold is 2.0");
+    check(s.cheapThreshold() == 5.0, "default cheap threshold is 5.0");
     check(s.expensiveThreshold() == 10.0, "default expensive threshold is 10.0");
     check(s.resolution() == 15, "default resolution is 15 min");
 
