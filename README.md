@@ -77,10 +77,13 @@ dependencies — so it satisfies the Jolla Store harbour requirements.
 
 The app version follows `major.minor.patch` (e.g. `1.2.3`):
 
-- **major** — bumped when a GitHub milestone is complete. The first
-  milestone (Milestone 1) is the first Jolla Store release.
+- **major** — bumped when a GitHub milestone is complete. Milestone 1 is
+  the first Jolla Store release: **version 1.0.0**.
 - **minor** — bumped for new features.
 - **patch** — bumped for bug fixes.
+
+Every GitHub release goes to the Jolla Store immediately — releases are
+not batched up waiting for more fixes.
 
 The version is defined in **two places that must stay in sync**:
 
