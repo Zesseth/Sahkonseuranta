@@ -27,15 +27,25 @@ Row {
                                    : isExpensive ? redColor
                                    : yellowColor
 
-    spacing: Theme.paddingMedium
+    spacing: Theme.paddingLarge
 
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
-        width: ball.priceFontSize * 1.4
+        width: ball.priceFontSize * 1.7
         height: width
         radius: width / 2
         color: ball.stateColor
         visible: ball.hasData
+
+        // subtle ring so the ball reads well on any Ambience
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: -2
+            radius: width / 2
+            color: "transparent"
+            border.width: 2
+            border.color: Theme.rgba(ball.stateColor, 0.35)
+        }
     }
 
     Label {
@@ -43,6 +53,7 @@ Row {
         text: ball.price.toFixed(2).replace(".", ",") + qsTr(" snt/kWh")
         color: Theme.highlightColor
         font.pixelSize: ball.priceFontSize
+        font.bold: true
         visible: ball.hasData
     }
 }

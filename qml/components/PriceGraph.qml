@@ -50,6 +50,7 @@ Item {
                        ? parent.height - graph.zeroFromBottom - height
                        : parent.height - graph.zeroFromBottom
                     height: Math.min(Math.abs(model.modelData.price) * graph.pxPerUnit, parent.height)
+                    radius: Math.min(2, width / 2)
                     color: index === graph.nowIndex ? Theme.primaryColor : graph.barColor(model.modelData.price)
                     opacity: index === graph.nowIndex ? 0.9 : 1.0
                 }
