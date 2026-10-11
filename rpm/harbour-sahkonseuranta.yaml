@@ -1,8 +1,8 @@
 Name: harbour-sahkonseuranta
 Summary: Electricity spot price tracking
 Version: 0.1.0
-Release: 1
-Group: Applications/System
+Release: 4
+Group: Qt/Qt
 License: PolyForm-Noncommercial-1.0.0
 SCM: https://github.com/Zesseth/Sahkonseuranta
 URL: https://github.com/Zesseth/Sahkonseuranta
@@ -13,8 +13,18 @@ Description: |
   precision bar chart. Prices are fetched from
   porssisahko.net open API.
 Configure: none
-Builder: none
-NoFiles: 0
+Builder: cmake
+PkgConfigBR:
+  - sailfishapp >= 1.0.2
+  - Qt5Core
+  - Qt5Gui
+  - Qt5Qml
+  - Qt5Quick
+  - Qt5Network
+Requires:
+  - sailfishsilica-qt5 >= 0.10.9
 Files:
   - '%{_bindir}/%{name}'
   - '%{_datadir}/%{name}'
+  - '%{_datadir}/applications/%{name}.desktop'
+  - '%{_datadir}/icons/hicolor/*/apps/%{name}.png'

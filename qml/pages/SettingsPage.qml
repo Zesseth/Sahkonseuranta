@@ -7,16 +7,23 @@ Page {
     readonly property color cardColor: Theme.rgba(Theme.highlightBackgroundColor, 0.2)
     readonly property int cardRadius: Theme.paddingLarge
 
+    function fmt(v) {
+        return v.toFixed(2).replace(".", ",")
+    }
+
     function applyCheap(text) {
         var v = parseFloat(String(text).replace(",", "."))
         if (!isNaN(v))
             appSettings.cheapThreshold = v
+        cheapField.text = fmt(appSettings.cheapThreshold)
+        expensiveField.text = fmt(appSettings.expensiveThreshold)
     }
 
     function applyExpensive(text) {
         var v = parseFloat(String(text).replace(",", "."))
         if (!isNaN(v))
             appSettings.expensiveThreshold = v
+        expensiveField.text = fmt(appSettings.expensiveThreshold)
     }
 
     SilicaFlickable {
@@ -62,7 +69,6 @@ Page {
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
                         EnterKey.iconSource: "image://theme/icon-m-enter-next"
                         EnterKey.onClicked: expensiveField.focus = true
-                        onAccepted: applyCheap(text)
                         onActiveFocusChanged: {
                             if (!activeFocus)
                                 applyCheap(text)
@@ -79,7 +85,6 @@ Page {
                         inputMethodHints: Qt.ImhFormattedNumbersOnly
                         EnterKey.iconSource: "image://theme/icon-m-enter-close"
                         EnterKey.onClicked: focus = false
-                        onAccepted: applyExpensive(text)
                         onActiveFocusChanged: {
                             if (!activeFocus)
                                 applyExpensive(text)
