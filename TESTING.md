@@ -1,4 +1,4 @@
-# Testing Guide — Sahkonseuranta
+# Testing Guide — Sähkönseuranta
 
 This document describes how the app is tested before a Jolla Store
 release: automated unit tests, SDK build, emulator testing, and device

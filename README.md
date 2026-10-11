@@ -1,4 +1,4 @@
-# Sahkonseuranta
+# Sähkönseuranta
 
 Electricity spot price tracker for SailfishOS. The app shows Finnish
 electricity spot prices as a **bar chart** at 15-minute or 1-hour
@@ -37,7 +37,7 @@ milestones.
 The Android app [HattiWatti](https://play.google.com/store/apps/details?id=com.hattiwatti.hattiwatti)
 was the original motivation for this project. This project is **not**
 a port or a replica of HattiWatti, and it does not aim to follow
-HattiWatti's development. Sahkonseuranta is an independent SailfishOS
+HattiWatti's development. Sähkönseuranta is an independent SailfishOS
 app with its own scope and roadmap.
 
 ## Project layout

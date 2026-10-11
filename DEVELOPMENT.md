@@ -1,11 +1,11 @@
-# Development Environment Setup — Sahkonseuranta
+# Development Environment Setup — Sähkönseuranta
 
 This guide explains how to set up a SailfishOS development environment on
 Windows, Linux, or macOS and get the project building and tested.
 
 ## Overview
 
-Sahkonseuranta is a SailfishOS application. Building the full application
+Sähkönseuranta is a SailfishOS application. Building the full application
 requires:
 
 - **Qt 5.15** (SailfishOS 4.6 ships Qt 5.15)
@@ -39,7 +39,7 @@ Inside the Linux environment:
 sudo apt-get update
 sudo apt-get install -y wget curl git build-essential \
     cmake pkg-config qt5-qmake qtbase5-dev \
-    qtdeclarative5-dev openjdk-17-jdk-headless
+    qtdeclarative5-dev
 ```
 
 ### 3. SailfishOS SDK
