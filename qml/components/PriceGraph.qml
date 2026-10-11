@@ -14,8 +14,16 @@ Item {
     property double cheapThreshold: 2.0
     property double expensiveThreshold: 10.0
 
-    // Fixed bar width: the chart scrolls when the window does not fit
-    readonly property double barWidth: 8
+    // Bar width from the screen: aim for roughly 6.5 hours of quarter
+    // bars or 14 hours of hourly bars visible at once, letting a
+    // couple of bars run past the edge rather than squeezing tighter.
+    readonly property double barWidth: {
+        var barsPerScreen = appSettings.resolution === 60 ? 14 : 26
+        return Math.max(plotAreaWidth / barsPerScreen, 2)
+    }
+    // Track the plot width explicitly to avoid binding loops with plotArea
+    property double plotAreaWidth: 200
+    onWidthChanged: plotAreaWidth = width - yAxisWidth
     readonly property int xAxisHeight: 22
     readonly property int yAxisWidth: 44
 
