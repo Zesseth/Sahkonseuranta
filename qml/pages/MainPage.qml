@@ -9,9 +9,13 @@ Page {
 
     Component.onCompleted: priceFetcher.refresh()
 
-    // Card background shared by the price card, chart card and stat cards
+    // Card background shared by all boxes
     readonly property color cardColor: Theme.rgba(Theme.highlightBackgroundColor, 0.2)
     readonly property int cardRadius: Theme.paddingLarge
+
+    function fmtPrice(v) {
+        return v.toFixed(2).replace(".", ",")
+    }
 
     SilicaFlickable {
         id: flick
@@ -51,22 +55,21 @@ Page {
                 title: dayOffset === 0 ? qsTr("Pörssisähkö tänään") : qsTr("Pörssisähkö huomenna")
             }
 
-            // Price card: ball + current price on the left
+            // Box 1: price level now + forecast of how long it holds
             Rectangle {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                height: priceRow.height + 2 * Theme.paddingLarge
+                height: priceBox1Column.height + 2 * Theme.paddingLarge
                 radius: page.cardRadius
                 color: page.cardColor
                 visible: (priceFetcher.hasData && dayOffset === 0) || priceFetcher.loading
 
-                Row {
-                    id: priceRow
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.leftMargin: Theme.paddingLarge
-                    spacing: Theme.paddingLarge
-                    visible: priceFetcher.hasData && dayOffset === 0
+                Column {
+                    id: priceBox1Column
+                    x: Theme.paddingLarge
+                    width: parent.width - 2 * Theme.paddingLarge
+                    y: Theme.paddingLarge
+                    spacing: Theme.paddingSmall
 
                     PriceBall {
                         price: priceFetcher.displayPrice
@@ -76,23 +79,28 @@ Page {
                     }
 
                     Label {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: qsTr("Nyt")
+                        visible: priceFetcher.hasData && dayOffset === 0
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        text: priceFetcher.hasNextPrice
+                              ? qsTr("Taso pysyy klo %1 asti, jolloin hinta on %2")
+                                    .arg(Qt.formatDateTime(priceFetcher.nextPriceStart, "HH:mm"))
+                                    .arg(page.fmtPrice(priceFetcher.nextPrice))
+                              : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan")
                         color: Theme.secondaryHighlightColor
-                        font.pixelSize: Theme.fontSizeMedium
+                        font.pixelSize: Theme.fontSizeSmall
                     }
-                }
 
-                Label {
-                    visible: !priceFetcher.hasData
-                    anchors.centerIn: parent
-                    text: priceFetcher.loading ? qsTr("Ladataan...") : qsTr("Ei tietoja")
-                    color: Theme.secondaryColor
-                    font.pixelSize: Theme.fontSizeLarge
+                    Label {
+                        visible: !priceFetcher.hasData
+                        text: priceFetcher.loading ? qsTr("Ladataan...") : qsTr("Ei tietoja")
+                        color: Theme.secondaryColor
+                        font.pixelSize: Theme.fontSizeLarge
+                    }
                 }
             }
 
-            // Error text when there is no card to show it in
+            // Error text when there is no box to show it in
             Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
@@ -102,117 +110,124 @@ Page {
                 wrapMode: Text.WordWrap
             }
 
-            // Chart card
+            // Box 2: price now at clock + period, and today's stats
             Rectangle {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                height: graph.height + 2 * Theme.paddingLarge
+                height: statsColumn.height + 2 * Theme.paddingLarge
                 radius: page.cardRadius
                 color: page.cardColor
                 visible: priceFetcher.hasData
 
-                PriceGraph {
-                    id: graph
+                Column {
+                    id: statsColumn
+                    x: Theme.paddingLarge
                     width: parent.width - 2 * Theme.paddingLarge
-                    height: Math.max(page.height * 0.35, Theme.itemSizeHuge)
-                    anchors.centerIn: parent
-                    bars: priceFetcher.bars
-                    avgPrice: priceFetcher.avgPrice
-                    minPrice: priceFetcher.minPrice
-                    maxPrice: priceFetcher.maxPrice
-                    nowIndex: priceFetcher.nowIndex
-                    cheapThreshold: appSettings.cheapThreshold
-                    expensiveThreshold: appSettings.expensiveThreshold
+                    y: Theme.paddingLarge
+                    spacing: Theme.paddingMedium
+
+                    Label {
+                        width: parent.width
+                        text: dayOffset === 0
+                              ? qsTr("Hinta on nyt klo %1 (%2)")
+                                    .arg(Qt.formatDateTime(new Date(), "HH:mm"))
+                                    .arg(appSettings.resolution === 60 ? qsTr("tunnin keskiarvo") : qsTr("vartin hinta"))
+                              : qsTr("Huomisen hinnat")
+                        color: Theme.primaryColor
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+
+                    Row {
+                        width: parent.width
+                        spacing: Theme.paddingLarge
+
+                        Column {
+                            width: (parent.width - 2 * parent.spacing) / 3
+                            spacing: 2
+
+                            Label {
+                                text: qsTr("Keskiarvo")
+                                color: Theme.secondaryHighlightColor
+                                font.pixelSize: Theme.fontSizeSmall
+                            }
+                            Label {
+                                text: page.fmtPrice(priceFetcher.avgPrice)
+                                color: Theme.highlightColor
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.bold: true
+                            }
+                        }
+
+                        Column {
+                            width: (parent.width - 2 * parent.spacing) / 3
+                            spacing: 2
+
+                            Label {
+                                text: qsTr("Alin")
+                                color: Theme.secondaryHighlightColor
+                                font.pixelSize: Theme.fontSizeSmall
+                            }
+                            Label {
+                                text: page.fmtPrice(priceFetcher.minPrice)
+                                color: Theme.highlightColor
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.bold: true
+                            }
+                        }
+
+                        Column {
+                            width: (parent.width - 2 * parent.spacing) / 3
+                            spacing: 2
+
+                            Label {
+                                text: qsTr("Ylin")
+                                color: Theme.secondaryHighlightColor
+                                font.pixelSize: Theme.fontSizeSmall
+                            }
+                            Label {
+                                text: page.fmtPrice(priceFetcher.maxPrice)
+                                color: Theme.highlightColor
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.bold: true
+                            }
+                        }
+                    }
                 }
             }
 
-            // Stats row: three mini cards
-            Grid {
-                id: statsGrid
+            // Box 3: the chart
+            Rectangle {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                columns: 3
-                spacing: Theme.paddingLarge
+                height: chartColumn.height + 2 * Theme.paddingLarge
+                radius: page.cardRadius
+                color: page.cardColor
                 visible: priceFetcher.hasData
 
-                Rectangle {
-                    width: (statsGrid.width - 2 * statsGrid.spacing) / 3
-                    height: avgColumn.height + 2 * Theme.paddingLarge
-                    radius: page.cardRadius / 2
-                    color: page.cardColor
+                Column {
+                    id: chartColumn
+                    x: Theme.paddingLarge
+                    width: parent.width - 2 * Theme.paddingLarge
+                    y: Theme.paddingLarge
+                    spacing: Theme.paddingSmall
 
-                    Column {
-                        id: avgColumn
-                        anchors.centerIn: parent
-                        spacing: 2
-
-                        Label {
-                            text: qsTr("Keskiarvo")
-                            color: Theme.secondaryHighlightColor
-                            font.pixelSize: Theme.fontSizeSmall
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Label {
-                            text: priceFetcher.avgPrice.toFixed(2).replace(".", ",")
-                            color: Theme.highlightColor
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.bold: true
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
+                    Label {
+                        text: qsTr("Pylväät c/kWh, katkoviivat omat rajat")
+                        color: Theme.secondaryHighlightColor
+                        font.pixelSize: Theme.fontSizeSmall
                     }
-                }
 
-                Rectangle {
-                    width: (statsGrid.width - 2 * statsGrid.spacing) / 3
-                    height: minColumn.height + 2 * Theme.paddingLarge
-                    radius: page.cardRadius / 2
-                    color: page.cardColor
-
-                    Column {
-                        id: minColumn
-                        anchors.centerIn: parent
-                        spacing: 2
-
-                        Label {
-                            text: qsTr("Alin")
-                            color: Theme.secondaryHighlightColor
-                            font.pixelSize: Theme.fontSizeSmall
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Label {
-                            text: priceFetcher.minPrice.toFixed(2).replace(".", ",")
-                            color: Theme.highlightColor
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.bold: true
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                    }
-                }
-
-                Rectangle {
-                    width: (statsGrid.width - 2 * statsGrid.spacing) / 3
-                    height: maxColumn.height + 2 * Theme.paddingLarge
-                    radius: page.cardRadius / 2
-                    color: page.cardColor
-
-                    Column {
-                        id: maxColumn
-                        anchors.centerIn: parent
-                        spacing: 2
-
-                        Label {
-                            text: qsTr("Ylin")
-                            color: Theme.secondaryHighlightColor
-                            font.pixelSize: Theme.fontSizeSmall
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
-                        Label {
-                            text: priceFetcher.maxPrice.toFixed(2).replace(".", ",")
-                            color: Theme.highlightColor
-                            font.pixelSize: Theme.fontSizeLarge
-                            font.bold: true
-                            anchors.horizontalCenter: parent.horizontalCenter
-                        }
+                    PriceGraph {
+                        id: graph
+                        width: parent.width
+                        height: Math.max(page.height * 0.3, Theme.itemSizeHuge)
+                        bars: priceFetcher.bars
+                        avgPrice: priceFetcher.avgPrice
+                        minPrice: priceFetcher.minPrice
+                        maxPrice: priceFetcher.maxPrice
+                        nowIndex: priceFetcher.nowIndex
+                        cheapThreshold: appSettings.cheapThreshold
+                        expensiveThreshold: appSettings.expensiveThreshold
                     }
                 }
             }

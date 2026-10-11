@@ -44,6 +44,10 @@ double PriceFetcher::minPrice() const { return m_min; }
 double PriceFetcher::maxPrice() const { return m_max; }
 int PriceFetcher::resolution() const { return m_resolution; }
 int PriceFetcher::nowIndex() const { return m_nowIndex; }
+QDateTime PriceFetcher::nowUntil() const { return m_nowUntil; }
+bool PriceFetcher::hasNextPrice() const { return m_hasNextPrice; }
+double PriceFetcher::nextPrice() const { return m_nextPrice; }
+QDateTime PriceFetcher::nextPriceStart() const { return m_nextPriceStart; }
 
 void PriceFetcher::setResolution(int res)
 {
@@ -244,6 +248,33 @@ void PriceFetcher::buildBars()
             }
         }
     }
+
+    // Forecast: how long the ongoing price level holds and what follows it.
+    m_nowUntil = QDateTime();
+    m_hasNextPrice = false;
+    m_nextPrice = 0.0;
+    m_nextPriceStart = QDateTime();
+    if (m_dayOffset == 0 && m_nowIndex >= 0 && m_nowIndex < dayPrices.size()) {
+        const QVariantMap cur = dayPrices.at(m_nowIndex).toMap();
+        const QDateTime start = cur.value(QStringLiteral("start")).toDateTime();
+        const int periodMin = (m_resolution == 60) ? 60 : 15;
+        QDateTime end = cur.value(QStringLiteral("end")).toDateTime();
+        if (!end.isValid())
+            end = start.addSecs(periodMin * 60);
+        m_nowUntil = end;
+        const double curPrice = cur.value(QStringLiteral("price")).toDouble();
+        for (int i = m_nowIndex + 1; i < dayPrices.size(); ++i) {
+            const QVariantMap e = dayPrices.at(i).toMap();
+            const double p = e.value(QStringLiteral("price")).toDouble();
+            if (qAbs(p - curPrice) > 0.0001) {
+                m_nextPrice = p;
+                m_nextPriceStart = e.value(QStringLiteral("start")).toDateTime();
+                m_hasNextPrice = true;
+                break;
+            }
+        }
+    }
+
     m_bars = dayPrices;
     emit barsChanged();
     emit currentPriceChanged();

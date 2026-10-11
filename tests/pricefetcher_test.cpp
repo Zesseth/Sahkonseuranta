@@ -74,6 +74,12 @@ int main(int argc, char *argv[])
               "display price equals spot price at 15 min resolution");
         check(f.minPrice() <= f.avgPrice() + 0.0001, "min <= avg");
         check(f.avgPrice() <= f.maxPrice() + 0.0001, "avg <= max");
+        check(f.nowUntil().isValid() && f.nowUntil() > QDateTime::currentDateTime(),
+              "forecast: current period end is in the future");
+        if (f.hasNextPrice()) {
+            check(f.nextPriceStart().isValid() && f.nextPriceStart() >= f.nowUntil(),
+                  "forecast: next price change is after the current period ends");
+        }
 
         f.setResolution(60);
     });

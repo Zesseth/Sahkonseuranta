@@ -25,6 +25,13 @@ class PriceFetcher : public QObject
     Q_PROPERTY(double maxPrice READ maxPrice NOTIFY currentPriceChanged)
     Q_PROPERTY(int resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
     Q_PROPERTY(int nowIndex READ nowIndex NOTIFY barsChanged)
+    // How long the current price level holds and what it changes into.
+    // nowUntil is the end of the ongoing price period; nextPrice/nextPriceStart
+    // describe the first following period with a different price (hasNextPrice).
+    Q_PROPERTY(QDateTime nowUntil READ nowUntil NOTIFY currentPriceChanged)
+    Q_PROPERTY(bool hasNextPrice READ hasNextPrice NOTIFY currentPriceChanged)
+    Q_PROPERTY(double nextPrice READ nextPrice NOTIFY currentPriceChanged)
+    Q_PROPERTY(QDateTime nextPriceStart READ nextPriceStart NOTIFY currentPriceChanged)
 
 public:
     explicit PriceFetcher(QObject *parent = nullptr);
@@ -42,6 +49,10 @@ public:
     int resolution() const;
     void setResolution(int res);
     int nowIndex() const;
+    QDateTime nowUntil() const;
+    bool hasNextPrice() const;
+    double nextPrice() const;
+    QDateTime nextPriceStart() const;
 
     Q_INVOKABLE void refresh();
     Q_INVOKABLE void showToday();
@@ -76,6 +87,10 @@ private:
     int m_resolution = 15;
     int m_dayOffset = 0;
     int m_nowIndex = -1;
+    QDateTime m_nowUntil;
+    bool m_hasNextPrice = false;
+    double m_nextPrice = 0.0;
+    QDateTime m_nextPriceStart;
 };
 
 #endif // PRICEFETCHER_H
