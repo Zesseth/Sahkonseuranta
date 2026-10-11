@@ -184,8 +184,9 @@ Item {
                                : parent.height - graph.zeroFromBottom
                             height: Math.min(Math.abs(model.modelData.price) * graph.pxPerUnit, parent.height)
                             radius: Math.min(3, width / 2)
-                            color: index === graph.nowIndex ? Theme.primaryColor : graph.barColor(model.modelData.price)
-                            opacity: index === graph.nowIndex ? 0.95 : 1.0
+                            color: graph.barColor(model.modelData.price)
+                            border.width: index === graph.nowIndex ? 2 : 0
+                            border.color: Theme.primaryColor
                         }
                     }
                 }
@@ -279,6 +280,18 @@ Item {
                     color: Theme.secondaryColor
                     font.pixelSize: Theme.fontSizeTiny
                 }
+            }
+
+            // "Now" marker under the axis, scrolling with the bars
+            Rectangle {
+                visible: graph.nowIndex >= 0 && graph.nowIndex < graph.bars.length
+                x: graph.barX(graph.nowIndex) + graph.barWidth / 2 - 4
+                y: axisRow.height / 2 - 4
+                width: 8
+                height: 8
+                radius: 1
+                rotation: 45
+                color: Theme.primaryColor
             }
         }
     }
