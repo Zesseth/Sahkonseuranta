@@ -18,7 +18,7 @@ Item {
     // Fixed bar width: the chart scrolls when the window does not fit
     readonly property double barWidth: 8
     readonly property int xAxisHeight: 22
-    readonly property int yAxisWidth: 40
+    readonly property int yAxisWidth: 44
 
     // Data-driven value range of the visible window (whole cents)
     readonly property double dataMax: {
@@ -131,6 +131,7 @@ Item {
 
             Label {
                 anchors.right: parent.right
+                anchors.rightMargin: Theme.paddingSmall
                 y: yAxis.height - graph.yFromBottom(modelData) - height / 2
                 text: modelData
                 color: Theme.secondaryColor
