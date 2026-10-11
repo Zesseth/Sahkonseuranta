@@ -32,6 +32,14 @@ Page {
         return qsTr("Keskitaso")
     }
 
+    function levelNameIllative(level) {
+        if (level === 0)
+            return qsTr("halvan tasoon")
+        if (level === 2)
+            return qsTr("kalliin tasoon")
+        return qsTr("keskitasoon")
+    }
+
     function levelColor(level) {
         if (level === 0)
             return "#2ecc71"
@@ -152,10 +160,8 @@ Page {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 text: page.nextLevel !== null
-                                      ? qsTr("Vaihtuu %1-tasoon")
-                                            .arg(page.nextLevel !== null
-                                                 ? page.levelName(page.levelOf(page.nextLevel.price))
-                                                 : "")
+                                      ? qsTr("Vaihtuu %1")
+                                            .arg(page.levelNameIllative(page.levelOf(page.nextLevel.price)))
                                       : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan")
                                 color: page.nextLevel !== null
                                        ? page.levelColor(page.levelOf(page.nextLevel.price))
