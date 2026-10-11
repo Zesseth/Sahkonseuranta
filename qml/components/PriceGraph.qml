@@ -117,14 +117,7 @@ Item {
         }
         width: graph.yAxisWidth
 
-        Label {
-            anchors.top: parent.top
-            anchors.right: parent.right
-            text: qsTr("c/kWh")
-            color: Theme.secondaryHighlightColor
-            font.pixelSize: Theme.fontSizeTiny
-        }
-
+        // The c/kWh unit lives in the chart caption; here only the values
         Repeater {
             model: graph.yTicks
 
