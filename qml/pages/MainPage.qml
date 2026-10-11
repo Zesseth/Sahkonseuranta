@@ -275,7 +275,6 @@ Page {
                                - 3 * column.spacing
                                - 5 * Theme.paddingLarge
                         bars: priceFetcher.allBars
-                        avgPrice: priceFetcher.avgPrice
                         nowIndex: priceFetcher.allNowIndex
                         cheapThreshold: appSettings.cheapThreshold
                         expensiveThreshold: appSettings.expensiveThreshold

@@ -10,7 +10,6 @@ Item {
     id: graph
 
     property var bars: []
-    property double avgPrice: 0.0
     property int nowIndex: -1
     property double cheapThreshold: 2.0
     property double expensiveThreshold: 10.0
@@ -200,7 +199,7 @@ Item {
                     ctx.clearRect(0, 0, width, height)
                     ctx.lineWidth = 1
                     // Qt 5.6 canvas has no setLineDash: draw the dashes by hand
-                    function dashed(color, value) {
+                    function dashedH(color, value, dash, gap) {
                         if (value < graph.minV || value > graph.maxV)
                             return
                         var y = height - graph.yFromBottom(value)
@@ -209,37 +208,42 @@ Item {
                         var x = 0
                         while (x < width) {
                             ctx.moveTo(x, y)
-                            ctx.lineTo(Math.min(x + 4, width), y)
-                            x += 8
+                            ctx.lineTo(Math.min(x + dash, width), y)
+                            x += dash + gap
                         }
                         ctx.stroke()
                     }
-                    dashed(graph.barColor(graph.cheapThreshold), graph.cheapThreshold)
-                    dashed(graph.barColor(graph.expensiveThreshold), graph.expensiveThreshold)
-                    // solid average line
-                    var yAvg = height - graph.yFromBottom(graph.avgPrice)
-                    ctx.strokeStyle = Theme.rgba(Theme.secondaryColor, 0.8)
-                    ctx.beginPath()
-                    ctx.moveTo(0, yAvg)
-                    ctx.lineTo(width, yAvg)
-                    ctx.stroke()
+                    function dashedV(color, x, dash, gap) {
+                        ctx.strokeStyle = color
+                        ctx.beginPath()
+                        var y = 0
+                        while (y < height) {
+                            ctx.moveTo(x, y)
+                            ctx.lineTo(x, Math.min(y + dash, height))
+                            y += dash + gap
+                        }
+                        ctx.stroke()
+                    }
+                    // Gray grid: horizontal every five cents
+                    var gridCol = Theme.rgba(Theme.secondaryColor, 0.35)
+                    for (var v = graph.tickBottom; v <= graph.tickTop + 0.01; v += 5)
+                        dashedH(gridCol, v, 3, 5)
+                    // ...and vertical at every whole hour
+                    for (var i = 0; i < graph.bars.length; ++i) {
+                        if (graph.bars[i].start.getMinutes() === 0)
+                            dashedV(gridCol, (i + 0.5) * graph.barWidth, 3, 5)
+                    }
+                    // Threshold lines on top, colored
+                    dashedH(graph.barColor(graph.cheapThreshold), graph.cheapThreshold, 4, 4)
+                    dashedH(graph.barColor(graph.expensiveThreshold), graph.expensiveThreshold, 4, 4)
                 }
 
                 Connections {
                     target: graph
                     onBarsChanged: linesCanvas.requestPaint()
-                    onAvgPriceChanged: linesCanvas.requestPaint()
                 }
             }
 
-            // Zero line when there are negative prices
-            Rectangle {
-                width: scroll.contentWidth
-                height: 1
-                y: scroll.height - graph.zeroFromBottom
-                visible: graph.bars.length > 0 && graph.dataMin < 0
-                color: Theme.secondaryColor
-            }
         }
     }
 
