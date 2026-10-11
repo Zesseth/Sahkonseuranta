@@ -112,8 +112,8 @@ sfdk emulator --armv7hl   # or the x86 VM
    - [ ] With 1 h resolution, the displayed price is the ongoing
          hour's average (not the quarter-hour spot price)
    - [ ] PullDownMenu -> "Päivitä" refreshes the data
-   - [ ] PullDownMenu -> "Näytä huominen": bars visible after 14:15;
-         an empty view before that is OK
+   - [ ] The chart shows the full ~48 h window the API returns and
+         scrolls sideways; tomorrow's bars are reachable by scrolling
    - [ ] Cover shows the ball and the current price while the app is in
          the background
    - [ ] Airplane mode: "Päivitä" shows an error instead of crashing

@@ -76,18 +76,6 @@ void PriceFetcher::refresh()
     connect(m_reply, &QNetworkReply::finished, this, &PriceFetcher::onFinished);
 }
 
-void PriceFetcher::showToday()
-{
-    m_dayOffset = 0;
-    buildBars();
-}
-
-void PriceFetcher::showTomorrow()
-{
-    m_dayOffset = 1;
-    buildBars();
-}
-
 void PriceFetcher::onFinished()
 {
     if (!m_reply)
@@ -202,7 +190,7 @@ void PriceFetcher::buildBars()
     }
 
     QDateTime now = QDateTime::currentDateTime();
-    QDate day = now.date().addDays(m_dayOffset);
+    QDate day = now.date();
 
     // Everything the API returned, in ascending time order
     QVariantList sorted = m_prices;
@@ -252,22 +240,20 @@ void PriceFetcher::buildBars()
         }
     }
 
-    if (m_dayOffset == 0) {
-        for (int i = 0; i < dayPrices.size(); ++i) {
-            QVariantMap entry = dayPrices.at(i).toMap();
-            QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
-            QDateTime end = entry.value(QStringLiteral("end")).toDateTime();
-            if (!end.isValid())
-                end = start.addSecs(3600);
-            if (start <= now && now < end) {
-                m_nowIndex = i;
-                break;
-            }
+    for (int i = 0; i < dayPrices.size(); ++i) {
+        QVariantMap entry = dayPrices.at(i).toMap();
+        QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
+        QDateTime end = entry.value(QStringLiteral("end")).toDateTime();
+        if (!end.isValid())
+            end = start.addSecs(3600);
+        if (start <= now && now < end) {
+            m_nowIndex = i;
+            break;
         }
     }
 
     // Index of "now" in the full window (for the scrollable chart)
-    if (m_dayOffset == 0) {
+    {
         const int periodMin = (m_resolution == 60) ? 60 : 15;
         for (int i = 0; i < m_allBars.size(); ++i) {
             QVariantMap entry = m_allBars.at(i).toMap();
@@ -285,7 +271,7 @@ void PriceFetcher::buildBars()
     m_hasNextPrice = false;
     m_nextPrice = 0.0;
     m_nextPriceStart = QDateTime();
-    if (m_dayOffset == 0 && m_nowIndex >= 0 && m_nowIndex < dayPrices.size()) {
+    if (m_nowIndex >= 0 && m_nowIndex < dayPrices.size()) {
         const QVariantMap cur = dayPrices.at(m_nowIndex).toMap();
         const QDateTime start = cur.value(QStringLiteral("start")).toDateTime();
         const int periodMin = (m_resolution == 60) ? 60 : 15;

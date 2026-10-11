@@ -5,8 +5,6 @@ import "../components"
 Page {
     id: page
 
-    property int dayOffset: 0
-
     Component.onCompleted: priceFetcher.refresh()
 
     // Card background shared by all boxes
@@ -81,23 +79,6 @@ Page {
                 onClicked: priceFetcher.refresh()
             }
             MenuItem {
-                text: dayOffset === 0 ? qsTr("Näytä huominen") : qsTr("Näytä tänään")
-                onClicked: {
-                    if (dayOffset === 0) {
-                        dayOffset = 1
-                        priceFetcher.showTomorrow()
-                        var d = new Date()
-                        d.setDate(d.getDate() + 1)
-                        d.setHours(0, 0, 0, 0)
-                        graph.scrollToDate(d)
-                    } else {
-                        dayOffset = 0
-                        priceFetcher.showToday()
-                        graph.scrollToNow()
-                    }
-                }
-            }
-            MenuItem {
                 text: qsTr("Asetukset")
                 onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
             }
@@ -110,7 +91,7 @@ Page {
 
             PageHeader {
                 id: header
-                title: dayOffset === 0 ? qsTr("Pörssisähkö tänään") : qsTr("Pörssisähkö huomenna")
+                title: qsTr("Pörssisähkö tänään")
             }
 
             // Box 1: price level now + forecast of how long it holds
@@ -121,7 +102,7 @@ Page {
                 height: priceBox1Column.height + 2 * Theme.paddingLarge
                 radius: page.cardRadius
                 color: page.cardColor
-                visible: (priceFetcher.hasData && dayOffset === 0) || priceFetcher.loading
+                visible: priceFetcher.hasData || priceFetcher.loading
 
                 Column {
                     id: priceBox1Column
@@ -132,10 +113,8 @@ Page {
 
                     Label {
                         visible: priceFetcher.hasData
-                        text: dayOffset === 0
-                              ? qsTr("Hinta on nyt klo %1")
-                                    .arg(page.currentPeriodStart())
-                              : qsTr("Huomisen hinnat")
+                        text: qsTr("Hinta on nyt klo %1")
+                              .arg(page.currentPeriodStart())
                         color: Theme.primaryColor
                         font.pixelSize: Theme.fontSizeMedium
                     }
@@ -161,7 +140,6 @@ Page {
                             spacing: Theme.paddingSmall
 
                             Label {
-                                visible: dayOffset === 0
                                 text: qsTr("Taso nyt: %1")
                                       .arg(page.levelName(page.levelOf(priceFetcher.displayPrice)))
                                 color: page.levelColor(page.levelOf(priceFetcher.displayPrice))
@@ -171,7 +149,6 @@ Page {
 
                             Label {
                                 id: levelChangeLabel
-                                visible: dayOffset === 0
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 text: page.nextLevel !== null
@@ -187,7 +164,7 @@ Page {
                             }
 
                             Label {
-                                visible: dayOffset === 0 && page.nextLevel !== null
+                                visible: page.nextLevel !== null
                                 text: page.nextLevel !== null
                                       ? qsTr("klo %1 · %2 snt/kWh")
                                             .arg(Qt.formatDateTime(page.nextLevel.start, "HH:mm"))

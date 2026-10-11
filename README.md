@@ -26,8 +26,6 @@ English.
   tomorrow), colored with the same thresholds: current bar marked
   with a bright border and an axis diamond, dashed threshold lines,
   gray grid, whole-cent y axis, whole-hour x axis
-- Today / tomorrow view (the tomorrow view scrolls the chart to
-  tomorrow midnight)
 - Stats row: average / min / max for the day
 - Cover page showing the current price
 - Automatic refresh every 30 minutes

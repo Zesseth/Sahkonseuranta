@@ -61,8 +61,6 @@ public:
     QDateTime nextPriceStart() const;
 
     Q_INVOKABLE void refresh();
-    Q_INVOKABLE void showToday();
-    Q_INVOKABLE void showTomorrow();
 
 signals:
     void loadingChanged();
@@ -93,7 +91,6 @@ private:
     double m_min = 0.0;
     double m_max = 0.0;
     int m_resolution = 15;
-    int m_dayOffset = 0;
     int m_nowIndex = -1;
     QDateTime m_nowUntil;
     bool m_hasNextPrice = false;
