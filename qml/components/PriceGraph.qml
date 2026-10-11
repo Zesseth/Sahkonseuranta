@@ -9,6 +9,8 @@ Item {
     property double minPrice: 0.0
     property double maxPrice: 0.0
     property int nowIndex: -1
+    property double cheapThreshold: 2.0
+    property double expensiveThreshold: 10.0
 
     readonly property double minV: minPrice < 0
                                    ? -Math.max(Math.abs(minPrice), Math.abs(maxPrice))
@@ -20,11 +22,11 @@ Item {
     function barColor(price) {
         if (price < 0)
             return "#2ecc71"
-        if (price <= avgPrice)
+        if (price <= cheapThreshold)
             return "#2ecc71"
-        if (avgPrice > 0 && price <= avgPrice * 2.0)
-            return "#f1c40f"
-        return "#e74c3c"
+        if (price >= expensiveThreshold)
+            return "#e74c3c"
+        return "#f1c40f"
     }
 
     implicitHeight: Theme.itemSizeHuge

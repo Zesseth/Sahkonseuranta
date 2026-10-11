@@ -10,12 +10,16 @@ English.
 
 ## Features (v0.1)
 
-- Current spot price displayed prominently (c/kWh, VAT included)
-- Traffic-light pricing: green = cheap (at or below the daily average, or
-  negative), yellow = normal (up to 2x the daily average), red = expensive
-- Switchable 15 min / 1 h resolution
-- Daily bar chart with traffic-light colors; current bar highlighted,
-  negative prices drawn below the zero line
+- Current price shown next to a **ball** whose color tells the price
+  level: green = cheap, yellow = normal, red = expensive
+- The color thresholds are **user-configurable** in the settings page
+  (cents per kWh, VAT-included prices)
+- Chart resolution (15 min / 1 h) is chosen in the settings and
+  persists across sessions
+- The displayed price follows the chosen resolution: the ongoing spot
+  price at 15 min, the ongoing hour's average at 1 h
+- Daily bar chart colored with the same thresholds; current bar
+  highlighted, negative prices drawn below the zero line
 - Today / tomorrow view
 - Stats row: average / min / max for the day
 - Cover page showing the current price
@@ -37,12 +41,14 @@ scope and roadmap.
 
 ```
 qml/harbour-sahkonseuranta.qml — application window
-qml/pages/MainPage.qml          — main page (chart, price info)
-qml/components/PriceGraph.qml   — bar chart component (traffic-light colors)
-qml/components/TrafficLight.qml — traffic light (cheap/normal/expensive)
+qml/pages/MainPage.qml          — main page (ball, price, chart, stats)
+qml/pages/SettingsPage.qml      — thresholds and chart resolution
+qml/components/PriceBall.qml    — colored ball + plain price
+qml/components/PriceGraph.qml   — bar chart component (threshold colors)
 qml/cover/CoverPage.qml         — cover page
-src/main.cpp                    — startup, priceFetcher exposed as context property
+src/main.cpp                    — startup, context properties
 src/pricefetcher.{h,cpp}        — API fetch, JSON parsing, aggregation
+src/settings.{h,cpp}            — user settings (QSettings persistence)
 icons/                          — launcher icons (86, 108, 128, 256)
 rpm/harbour-sahkonseuranta.yaml — RPM packaging
 ```

@@ -54,6 +54,8 @@ int main(int argc, char *argv[])
         check(dayStart.date() == dayEnd.date(), "bars span a single local day");
 
         check(f.currentPrice() > 0 || f.currentPrice() < 0, "current price set");
+        check(f.displayPrice() == f.currentPrice(),
+              "display price equals spot price at 15 min resolution");
         check(f.minPrice() <= f.avgPrice() + 0.0001, "min <= avg");
         check(f.avgPrice() <= f.maxPrice() + 0.0001, "avg <= max");
 
@@ -68,6 +70,13 @@ int main(int argc, char *argv[])
             QDateTime st = bars.at(0).toMap().value("start").toDateTime();
             check(st.time().hour() == 0 && st.time().minute() == 0,
                   "first hourly bar starts at 00:00");
+        }
+        // At 60 min resolution the displayed price is the ongoing hour's
+        // average bar, whenever the current hour is found in the bars.
+        if (f.nowIndex() >= 0 && f.nowIndex() < bars.size()) {
+            double barPrice = bars.at(f.nowIndex()).toMap().value("price").toDouble();
+            check(f.displayPrice() == barPrice,
+                  "display price equals the ongoing hour bar at 60 min");
         }
         printf("\n%d checks, %d failures\n", g_checks, g_failures);
         exit(g_failures == 0 ? 0 : 1);

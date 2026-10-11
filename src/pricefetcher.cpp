@@ -31,6 +31,14 @@ QString PriceFetcher::errorString() const { return m_error; }
 QVariantList PriceFetcher::prices() const { return m_prices; }
 QVariantList PriceFetcher::bars() const { return m_bars; }
 double PriceFetcher::currentPrice() const { return m_currentPrice; }
+
+double PriceFetcher::displayPrice() const
+{
+    if (m_resolution == 60 && m_nowIndex >= 0 && m_nowIndex < m_bars.size()) {
+        return m_bars.at(m_nowIndex).toMap().value(QStringLiteral("price")).toDouble();
+    }
+    return m_currentPrice;
+}
 double PriceFetcher::avgPrice() const { return m_avg; }
 double PriceFetcher::minPrice() const { return m_min; }
 double PriceFetcher::maxPrice() const { return m_max; }

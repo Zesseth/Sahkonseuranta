@@ -31,6 +31,10 @@ Page {
                     }
                 }
             }
+            MenuItem {
+                text: qsTr("Asetukset")
+                onClicked: pageStack.push(Qt.resolvedUrl("SettingsPage.qml"))
+            }
         }
 
         Column {
@@ -43,77 +47,31 @@ Page {
                 title: dayOffset === 0 ? qsTr("Pörssisähkö tänään") : qsTr("Pörssisähkö huomenna")
             }
 
-            Row {
+            PriceBall {
                 x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                spacing: Theme.paddingMedium
-
-                Column {
-                    id: priceColumn
-                    spacing: Theme.paddingSmall
-
-                    Label {
-                        text: priceFetcher.hasData
-                              ? priceFetcher.currentPrice.toFixed(2).replace(".", ",") + qsTr(" snt/kWh")
-                              : (priceFetcher.loading ? qsTr("Ladataan...") : qsTr("Ei tietoja"))
-                        color: priceFetcher.hasData ? Theme.highlightColor : Theme.secondaryColor
-                        font.pixelSize: Theme.fontSizeExtraLarge
-                    }
-
-                    Label {
-                        visible: dayOffset === 0
-                        text: qsTr("Nyt")
-                        color: Theme.secondaryColor
-                        font.pixelSize: Theme.fontSizeSmall
-                    }
-                }
-
-                TrafficLight {
-                    anchors.bottom: priceColumn.bottom
-                    price: priceFetcher.currentPrice
-                    avgPrice: priceFetcher.avgPrice
-                    hasData: priceFetcher.hasData && dayOffset === 0
-                }
+                visible: priceFetcher.hasData && dayOffset === 0
+                price: priceFetcher.displayPrice
+                cheapThreshold: appSettings.cheapThreshold
+                expensiveThreshold: appSettings.expensiveThreshold
+                hasData: priceFetcher.hasData
+                priceFontSize: Theme.fontSizeExtraLarge
             }
 
-            Row {
-                id: resRow
-                spacing: Theme.paddingSmall
+            Label {
                 x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                visible: !priceFetcher.hasData
+                text: priceFetcher.loading ? qsTr("Ladataan...") : qsTr("Ei tietoja")
+                color: Theme.secondaryColor
+                font.pixelSize: Theme.fontSizeExtraLarge
+            }
 
-                Rectangle {
-                    width: Theme.itemSizeExtraSmall * 1.6
-                    height: Theme.itemSizeSmall
-                    radius: Theme.paddingSmall
-                    color: priceFetcher.resolution === 15 ? Theme.highlightBackgroundColor : Theme.secondaryHighlightColor
-                    opacity: priceFetcher.resolution === 15 ? 1.0 : 0.5
-
-                    Label {
-                        anchors.centerIn: parent
-                        text: "15 min"
-                        color: priceFetcher.resolution === 15 ? Theme.highlightColor : Theme.primaryColor
-                        font.pixelSize: Theme.fontSizeSmall
-                    }
-
-                    MouseArea { anchors.fill: parent; onClicked: priceFetcher.resolution = 15 }
-                }
-
-                Rectangle {
-                    width: Theme.itemSizeExtraSmall * 1.6
-                    height: Theme.itemSizeSmall
-                    radius: Theme.paddingSmall
-                    color: priceFetcher.resolution === 60 ? Theme.highlightBackgroundColor : Theme.secondaryHighlightColor
-                    opacity: priceFetcher.resolution === 60 ? 1.0 : 0.5
-
-                    Label {
-                        anchors.centerIn: parent
-                        text: "1 h"
-                        color: priceFetcher.resolution === 60 ? Theme.highlightColor : Theme.primaryColor
-                        font.pixelSize: Theme.fontSizeSmall
-                    }
-
-                    MouseArea { anchors.fill: parent; onClicked: priceFetcher.resolution = 60 }
-                }
+            Label {
+                x: Theme.horizontalPageMargin
+                visible: priceFetcher.hasData && dayOffset === 0
+                text: qsTr("Nyt")
+                color: Theme.secondaryColor
+                font.pixelSize: Theme.fontSizeSmall
             }
 
             PriceGraph {
@@ -127,6 +85,8 @@ Page {
                 minPrice: priceFetcher.minPrice
                 maxPrice: priceFetcher.maxPrice
                 nowIndex: priceFetcher.nowIndex
+                cheapThreshold: appSettings.cheapThreshold
+                expensiveThreshold: appSettings.expensiveThreshold
             }
 
             Grid {

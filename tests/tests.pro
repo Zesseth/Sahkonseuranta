@@ -10,13 +10,6 @@ HEADERS += ../src/pricefetcher.h
 
 INCLUDEPATH += ../src
 DEPENDPATH += ../src
-<<<<<<< HEAD
 
-# MOC asetukset
 MOC_DIR = .moc
 OBJECTS_DIR = .obj
-
-# Qt moduulit
-LIBS += -lQt5Core -lQt5Network
-=======
->>>>>>> vibe/sahkonseuranta-mvp

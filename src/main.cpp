@@ -27,6 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #include <SailfishApp.h>
 #include <QScopedPointer>
 #include <QQuickView>
@@ -34,14 +35,22 @@
 #include <QtGui>
 #include <QtQml>
 #include "pricefetcher.h"
+#include "settings.h"
 
 int main(int argc, char *argv[])
 {
     QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
+    Settings settings;
     PriceFetcher fetcher;
+    fetcher.setResolution(settings.resolution());
+    QObject::connect(&settings, &Settings::resolutionChanged, &fetcher, [&settings, &fetcher]() {
+        fetcher.setResolution(settings.resolution());
+    });
+
     view->rootContext()->setContextProperty(QStringLiteral("priceFetcher"), &fetcher);
+    view->rootContext()->setContextProperty(QStringLiteral("appSettings"), &settings);
 
     view->setSource(SailfishApp::pathTo("qml/harbour-sahkonseuranta.qml"));
     view->show();

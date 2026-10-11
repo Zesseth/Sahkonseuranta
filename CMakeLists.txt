@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(harbour-sahkonseuranta
     VERSION 0.1.0
-    DESCRIPTION "Sähkön pörssihinnan seuranta"
+    DESCRIPTION "Finnish electricity spot price tracker"
     LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -14,7 +14,8 @@ find_package(SailfishApp 1.0 REQUIRED)
 
 add_executable(harbour-sahkonseuranta
     src/main.cpp
-    src/pricefetcher.cpp)
+    src/pricefetcher.cpp
+    src/settings.cpp)
 
 target_link_libraries(harbour-sahkonseuranta
     SailfishApp::SailfishApp

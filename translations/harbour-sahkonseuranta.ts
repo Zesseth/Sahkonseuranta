@@ -24,7 +24,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source> snt/kWh</source>
+        <source>Asetukset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -53,17 +53,44 @@
     </message>
 </context>
 <context>
-    <name>TrafficLight</name>
+    <name>PriceBall</name>
     <message>
-        <source>Halpa</source>
+        <source> snt/kWh</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SettingsPage</name>
+    <message>
+        <source>Asetukset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Normaali</source>
+        <source>Pallon värit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Kallis</source>
+        <source>Vihreä, kun hinta on korkeintaan (snt/kWh)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Punainen, kun hinta on vähintään (snt/kWh)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Graafin tarkkuus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Palkkien hinnoittelu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>15 min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>1 tunti</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -83,10 +110,6 @@
     </message>
     <message>
         <source>Keskihinta %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> snt/kWh</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

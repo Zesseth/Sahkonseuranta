@@ -25,18 +25,12 @@ CoverBackground {
             font.pixelSize: Theme.fontSizeSmall
         }
 
-        Label {
-            width: parent.width
-            text: priceFetcher.currentPrice.toFixed(2) + qsTr(" snt/kWh")
-            color: Theme.highlightColor
-            font.pixelSize: Theme.fontSizeLarge
-            truncationMode: TruncationMode.Fade
-        }
-
-        TrafficLight {
-            price: priceFetcher.currentPrice
-            avgPrice: priceFetcher.avgPrice
+        PriceBall {
+            price: priceFetcher.displayPrice
+            cheapThreshold: appSettings.cheapThreshold
+            expensiveThreshold: appSettings.expensiveThreshold
             hasData: priceFetcher.hasData
+            priceFontSize: Theme.fontSizeLarge
         }
 
         Label {

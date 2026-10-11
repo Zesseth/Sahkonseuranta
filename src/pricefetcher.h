@@ -17,6 +17,9 @@ class PriceFetcher : public QObject
     Q_PROPERTY(QVariantList prices READ prices NOTIFY pricesChanged)
     Q_PROPERTY(QVariantList bars READ bars NOTIFY barsChanged)
     Q_PROPERTY(double currentPrice READ currentPrice NOTIFY currentPriceChanged)
+    // Price shown on the front page: the spot price at 15 min resolution,
+    // or the average of the ongoing hour at 60 min resolution.
+    Q_PROPERTY(double displayPrice READ displayPrice NOTIFY barsChanged)
     Q_PROPERTY(double avgPrice READ avgPrice NOTIFY currentPriceChanged)
     Q_PROPERTY(double minPrice READ minPrice NOTIFY currentPriceChanged)
     Q_PROPERTY(double maxPrice READ maxPrice NOTIFY currentPriceChanged)
@@ -32,6 +35,7 @@ public:
     QVariantList prices() const;
     QVariantList bars() const;
     double currentPrice() const;
+    double displayPrice() const;
     double avgPrice() const;
     double minPrice() const;
     double maxPrice() const;
@@ -74,4 +78,4 @@ private:
     int m_nowIndex = -1;
 };
 
-#endif
+#endif // PRICEFETCHER_H
