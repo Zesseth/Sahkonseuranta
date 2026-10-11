@@ -1,0 +1,19 @@
+# Build artifacts
+build/
+RPMS/
+*.o
+*.rpm
+Makefile*
+.qmake.stash
+*.stash
+
+# Qt generated
+moc_*.cpp
+*.moc
+tests/.moc/
+tests/.obj/
+tests/pricefetcher_test
+
+# IDE
+*.pro.user
+*.autosave
