@@ -29,7 +29,24 @@ int main(int argc, char *argv[])
         QVariantList bars = f.bars();
         printf("bars=%d\n", bars.size());
 
-        check(bars.size() == 96, "96 bars at 15 min resolution");
+        // The API serves a rolling ~48 h window, so early quarter hours
+        // of the local day may already have rolled out. Expect exactly
+        // the entries the API provides for today.
+        QDate today = QDate::currentDate();
+        int expected = 0;
+        QDateTime earliest;
+        const QVariantList prices = f.prices();
+        for (int i = 0; i < prices.size(); ++i) {
+            QDateTime st = prices.at(i).toMap().value("start").toDateTime();
+            if (st.date() == today) {
+                ++expected;
+                if (!earliest.isValid() || st < earliest)
+                    earliest = st;
+            }
+        }
+        check(expected >= 90, "API provides (nearly) the full day");
+        check(bars.size() == expected,
+              "all quarter hours available for today are shown");
 
         bool ascending = true;
         QDateTime prev;
@@ -40,8 +57,7 @@ int main(int argc, char *argv[])
             QDateTime st = bars.at(i).toMap().value("start").toDateTime();
             if (first) {
                 dayStart = st;
-                check(st.time().hour() == 0 && st.time().minute() == 0,
-                      "first bar starts at 00:00");
+                check(st == earliest, "first bar matches the earliest available entry");
                 first = false;
             } else {
                 if (st < prev)
@@ -65,11 +81,26 @@ int main(int argc, char *argv[])
     QObject::connect(&f, &PriceFetcher::resolutionChanged, [&]() {
         QVariantList bars = f.bars();
         printf("hourly bars=%d\n", bars.size());
-        check(bars.size() == 24, "24 bars at 60 min resolution");
+
+        // Expect one bar per hour the API provides for today.
+        QDate today = QDate::currentDate();
+        int expectedHours = 0;
+        int earliestHour = -1;
+        const QVariantList prices = f.prices();
+        for (int i = 0; i < prices.size(); ++i) {
+            QDateTime st = prices.at(i).toMap().value("start").toDateTime();
+            if (st.date() == today && st.time().minute() == 0) {
+                ++expectedHours;
+                if (earliestHour < 0 || st.time().hour() < earliestHour)
+                    earliestHour = st.time().hour();
+            }
+        }
+        check(bars.size() == expectedHours,
+              "one hourly bar per hour available for today");
         if (bars.size() > 0) {
             QDateTime st = bars.at(0).toMap().value("start").toDateTime();
-            check(st.time().hour() == 0 && st.time().minute() == 0,
-                  "first hourly bar starts at 00:00");
+            check(st.time().hour() == earliestHour && st.time().minute() == 0,
+                  "first hourly bar matches the earliest available hour");
         }
         // At 60 min resolution the displayed price is the ongoing hour's
         // average bar, whenever the current hour is found in the bars.

@@ -4,16 +4,23 @@ import Sailfish.Silica 1.0
 Page {
     id: settingsPage
 
+    function fmt(v) {
+        return v.toFixed(2).replace(".", ",")
+    }
+
     function applyCheap(text) {
         var v = parseFloat(String(text).replace(",", "."))
         if (!isNaN(v))
             appSettings.cheapThreshold = v
+        cheapField.text = fmt(appSettings.cheapThreshold)
+        expensiveField.text = fmt(appSettings.expensiveThreshold)
     }
 
     function applyExpensive(text) {
         var v = parseFloat(String(text).replace(",", "."))
         if (!isNaN(v))
             appSettings.expensiveThreshold = v
+        expensiveField.text = fmt(appSettings.expensiveThreshold)
     }
 
     SilicaFlickable {

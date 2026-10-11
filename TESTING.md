@@ -44,8 +44,8 @@ qmake settings_test.pro -o Makefile.settings_test && make -f Makefile.settings_t
 
 ### Acceptance criteria
 
-- PriceFetcher: `11 checks, 0 failures`
-- Settings: `13 checks, 0 failures`
+- PriceFetcher: `12 checks, 0 failures`
+- Settings: `17 checks, 0 failures`
 - Exit code 0 (no crash, no assertion failure)
 
 The PriceFetcher test needs a network connection. If the API is down,
