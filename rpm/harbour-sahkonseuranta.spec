@@ -10,7 +10,7 @@ Name:       harbour-sahkonseuranta
 
 Summary:    Electricity spot price tracking
 Version:    0.1.0
-Release:    1
+Release:    2
 Group:      Qt/Qt
 License:    PolyForm-Noncommercial-1.0.0
 URL:        https://github.com/Zesseth/Sahkonseuranta
@@ -72,5 +72,9 @@ desktop-file-install --delete-original       \
 # << files
 
 %changelog
+* Sun Oct 11 2026 Zesseth <jlahtela@users.noreply.github.com> 0.1.0-2
+- Fix white screen on launch: harbour-sahkonseuranta.qml was missing
+  the pages import, so MainPage could not be resolved.
+
 * Sun Oct 11 2026 Zesseth <jlahtela@users.noreply.github.com> 0.1.0-1
 - Initial RPM package of Sähkönseuranta.
