@@ -55,6 +55,12 @@ the test prints `TIMEOUT` — run it again later.
 
 - **2026-10-11** Debian 13 (trixie), Qt 5.15.15, GCC 14:
   PriceFetcher `11 checks, 0 failures`; Settings `13 checks, 0 failures`
+- **2026-10-11** Static checks on the same host: all QML files pass
+  `qmllint` (syntax), `shellcheck` clean on `scripts/protect-main.sh`,
+  `desktop-file-validate` passes, RPM YAML parses, translation XML is
+  well-formed, no secrets in source. Found and fixed one real defect:
+  the 86/108/128 px launcher icons were actually 256 px images; they
+  are now correctly sized (resized from the 256 px master).
 - **2026-10-10** First PriceFetcher run (before thresholds/settings
   existed): found three real bugs, listed in "Test history" below.
 
