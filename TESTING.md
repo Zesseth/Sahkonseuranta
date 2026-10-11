@@ -44,7 +44,7 @@ qmake settings_test.pro -o Makefile.settings_test && make -f Makefile.settings_t
 
 ### Acceptance criteria
 
-- PriceFetcher: `14 checks, 0 failures`
+- PriceFetcher: `16 checks, 0 failures`
 - Settings: `17 checks, 0 failures`
 - Exit code 0 (no crash, no assertion failure)
 

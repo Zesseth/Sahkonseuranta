@@ -16,6 +16,10 @@ class PriceFetcher : public QObject
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
     Q_PROPERTY(QVariantList prices READ prices NOTIFY pricesChanged)
     Q_PROPERTY(QVariantList bars READ bars NOTIFY barsChanged)
+    // The full window the API returned (today + tomorrow), for the
+    // scrollable chart; bars covers only the selected day.
+    Q_PROPERTY(QVariantList allBars READ allBars NOTIFY barsChanged)
+    Q_PROPERTY(int allNowIndex READ allNowIndex NOTIFY barsChanged)
     Q_PROPERTY(double currentPrice READ currentPrice NOTIFY currentPriceChanged)
     // Price shown on the front page: the spot price at 15 min resolution,
     // or the average of the ongoing hour at 60 min resolution.
@@ -41,6 +45,8 @@ public:
     QString errorString() const;
     QVariantList prices() const;
     QVariantList bars() const;
+    QVariantList allBars() const;
+    int allNowIndex() const;
     double currentPrice() const;
     double displayPrice() const;
     double avgPrice() const;
@@ -80,6 +86,8 @@ private:
     QString m_error;
     QVariantList m_prices;
     QVariantList m_bars;
+    QVariantList m_allBars;
+    int m_allNowIndex = -1;
     double m_currentPrice = 0.0;
     double m_avg = 0.0;
     double m_min = 0.0;

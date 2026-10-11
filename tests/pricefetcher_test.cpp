@@ -76,6 +76,10 @@ int main(int argc, char *argv[])
         check(f.avgPrice() <= f.maxPrice() + 0.0001, "avg <= max");
         check(f.nowUntil().isValid() && f.nowUntil() > QDateTime::currentDateTime(),
               "forecast: current period end is in the future");
+        check(f.allBars().size() >= bars.size(),
+              "allBars covers at least the selected day");
+        check(f.allNowIndex() >= 0 && f.allNowIndex() < f.allBars().size(),
+              "allNowIndex points inside the full window");
         if (f.hasNextPrice()) {
             check(f.nextPriceStart().isValid() && f.nextPriceStart() >= f.nowUntil(),
                   "forecast: next price change is after the current period ends");

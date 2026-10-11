@@ -33,9 +33,14 @@ Page {
                     if (dayOffset === 0) {
                         dayOffset = 1
                         priceFetcher.showTomorrow()
+                        var d = new Date()
+                        d.setDate(d.getDate() + 1)
+                        d.setHours(0, 0, 0, 0)
+                        graph.scrollToDate(d)
                     } else {
                         dayOffset = 0
                         priceFetcher.showToday()
+                        graph.scrollToNow()
                     }
                 }
             }
@@ -221,13 +226,12 @@ Page {
                         id: graph
                         width: parent.width
                         height: Math.max(page.height * 0.3, Theme.itemSizeHuge)
-                        bars: priceFetcher.bars
+                        bars: priceFetcher.allBars
                         avgPrice: priceFetcher.avgPrice
-                        minPrice: priceFetcher.minPrice
-                        maxPrice: priceFetcher.maxPrice
-                        nowIndex: priceFetcher.nowIndex
+                        nowIndex: priceFetcher.allNowIndex
                         cheapThreshold: appSettings.cheapThreshold
                         expensiveThreshold: appSettings.expensiveThreshold
+                        onBarsChanged: scrollToNow()
                     }
                 }
             }

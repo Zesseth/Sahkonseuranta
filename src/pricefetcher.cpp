@@ -30,6 +30,8 @@ bool PriceFetcher::hasData() const { return !m_prices.isEmpty(); }
 QString PriceFetcher::errorString() const { return m_error; }
 QVariantList PriceFetcher::prices() const { return m_prices; }
 QVariantList PriceFetcher::bars() const { return m_bars; }
+QVariantList PriceFetcher::allBars() const { return m_allBars; }
+int PriceFetcher::allNowIndex() const { return m_allNowIndex; }
 double PriceFetcher::currentPrice() const { return m_currentPrice; }
 
 double PriceFetcher::displayPrice() const
@@ -137,13 +139,61 @@ void PriceFetcher::onFinished()
     emit errorStringChanged();
 }
 
+namespace {
+// Aggregate quarter-hour entries into hourly average bars.
+QVariantList aggregateHourly(const QVariantList &in)
+{
+    QVariantList hourly;
+    for (int i = 0; i < in.size(); ++i) {
+        QVariantMap entry = in.at(i).toMap();
+        QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
+        int found = -1;
+        for (int h = 0; h < hourly.size(); ++h) {
+            QVariantMap m = hourly.at(h).toMap();
+            QDateTime hs = m.value(QStringLiteral("start")).toDateTime();
+            if (hs.date() == start.date() && hs.time().hour() == start.time().hour()) {
+                found = h;
+                break;
+            }
+        }
+        if (found >= 0) {
+            QVariantMap m = hourly.at(found).toMap();
+            m.insert(QStringLiteral("priceSum"),
+                     m.value(QStringLiteral("priceSum")).toDouble()
+                     + entry.value(QStringLiteral("price")).toDouble());
+            m.insert(QStringLiteral("count"), m.value(QStringLiteral("count")).toInt() + 1);
+            hourly.replace(found, m);
+        } else {
+            QVariantMap m;
+            m.insert(QStringLiteral("start"), start);
+            m.insert(QStringLiteral("priceSum"), entry.value(QStringLiteral("price")).toDouble());
+            m.insert(QStringLiteral("count"), 1);
+            hourly.append(m);
+        }
+    }
+    QVariantList out;
+    for (int i = 0; i < hourly.size(); ++i) {
+        QVariantMap m = hourly.at(i).toMap();
+        QVariantMap bar;
+        bar.insert(QStringLiteral("start"), m.value(QStringLiteral("start")));
+        bar.insert(QStringLiteral("price"),
+                   m.value(QStringLiteral("priceSum")).toDouble()
+                   / m.value(QStringLiteral("count")).toDouble());
+        out.append(bar);
+    }
+    return out;
+}
+}
+
 void PriceFetcher::buildBars()
 {
     m_bars.clear();
+    m_allBars.clear();
     m_avg = 0.0;
     m_min = 0.0;
     m_max = 0.0;
     m_nowIndex = -1;
+    m_allNowIndex = -1;
 
     if (m_prices.isEmpty()) {
         emit barsChanged();
@@ -154,11 +204,21 @@ void PriceFetcher::buildBars()
     QDateTime now = QDateTime::currentDateTime();
     QDate day = now.date().addDays(m_dayOffset);
 
+    // Everything the API returned, in ascending time order
+    QVariantList sorted = m_prices;
+    std::sort(sorted.begin(), sorted.end(), [](const QVariant &a, const QVariant &b) {
+        return a.toMap().value(QStringLiteral("start")).toDateTime()
+                < b.toMap().value(QStringLiteral("start")).toDateTime();
+    });
+
+    // The full window for the scrollable chart
+    m_allBars = (m_resolution == 60) ? aggregateHourly(sorted) : sorted;
+
     QVariantList dayPrices;
     double sum = 0.0;
     int n = 0;
-    for (int i = 0; i < m_prices.size(); ++i) {
-        QVariantMap entry = m_prices.at(i).toMap();
+    for (int i = 0; i < sorted.size(); ++i) {
+        QVariantMap entry = sorted.at(i).toMap();
         QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
         if (start.date() == day) {
             dayPrices.append(entry);
@@ -166,11 +226,6 @@ void PriceFetcher::buildBars()
             n++;
         }
     }
-
-    std::sort(dayPrices.begin(), dayPrices.end(), [](const QVariant &a, const QVariant &b) {
-        return a.toMap().value(QStringLiteral("start")).toDateTime()
-                < b.toMap().value(QStringLiteral("start")).toDateTime();
-    });
 
     if (n > 0) {
         m_avg = sum / n;
@@ -183,46 +238,8 @@ void PriceFetcher::buildBars()
         }
     }
 
-    if (m_resolution == 60) {
-        QVariantList hourly;
-        for (int i = 0; i < dayPrices.size(); ++i) {
-            QVariantMap entry = dayPrices.at(i).toMap();
-            QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
-            int found = -1;
-            for (int h = 0; h < hourly.size(); ++h) {
-                QVariantMap m = hourly.at(h).toMap();
-                QDateTime hs = m.value(QStringLiteral("start")).toDateTime();
-                if (hs.date() == start.date() && hs.time().hour() == start.time().hour()) {
-                    found = h;
-                    break;
-                }
-            }
-            if (found >= 0) {
-                QVariantMap m = hourly.at(found).toMap();
-                m.insert(QStringLiteral("priceSum"),
-                         m.value(QStringLiteral("priceSum")).toDouble()
-                         + entry.value(QStringLiteral("price")).toDouble());
-                m.insert(QStringLiteral("count"), m.value(QStringLiteral("count")).toInt() + 1);
-                hourly.replace(found, m);
-            } else {
-                QVariantMap m;
-                m.insert(QStringLiteral("start"), start);
-                m.insert(QStringLiteral("priceSum"), entry.value(QStringLiteral("price")).toDouble());
-                m.insert(QStringLiteral("count"), 1);
-                hourly.append(m);
-            }
-        }
-        dayPrices.clear();
-        for (int i = 0; i < hourly.size(); ++i) {
-            QVariantMap m = hourly.at(i).toMap();
-            QVariantMap bar;
-            bar.insert(QStringLiteral("start"), m.value(QStringLiteral("start")));
-            bar.insert(QStringLiteral("price"),
-                       m.value(QStringLiteral("priceSum")).toDouble()
-                       / m.value(QStringLiteral("count")).toDouble());
-            dayPrices.append(bar);
-        }
-    }
+    if (m_resolution == 60)
+        dayPrices = aggregateHourly(dayPrices);
 
     m_currentPrice = 0.0;
     for (int i = 0; i < m_prices.size(); ++i) {
@@ -244,6 +261,20 @@ void PriceFetcher::buildBars()
                 end = start.addSecs(3600);
             if (start <= now && now < end) {
                 m_nowIndex = i;
+                break;
+            }
+        }
+    }
+
+    // Index of "now" in the full window (for the scrollable chart)
+    if (m_dayOffset == 0) {
+        const int periodMin = (m_resolution == 60) ? 60 : 15;
+        for (int i = 0; i < m_allBars.size(); ++i) {
+            QVariantMap entry = m_allBars.at(i).toMap();
+            QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
+            QDateTime end = start.addSecs(periodMin * 60);
+            if (start <= now && now < end) {
+                m_allNowIndex = i;
                 break;
             }
         }
