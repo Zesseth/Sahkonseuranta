@@ -102,7 +102,18 @@ Page {
                     y: Theme.paddingLarge
                     spacing: Theme.paddingSmall
 
+                    Label {
+                        visible: priceFetcher.hasData
+                        text: dayOffset === 0
+                              ? qsTr("Hinta on nyt klo %1")
+                                    .arg(Qt.formatDateTime(new Date(), "HH:mm"))
+                              : qsTr("Huomisen hinnat")
+                        color: Theme.primaryColor
+                        font.pixelSize: Theme.fontSizeMedium
+                    }
+
                     PriceBall {
+                        visible: priceFetcher.hasData
                         price: priceFetcher.displayPrice
                         cheapThreshold: appSettings.cheapThreshold
                         expensiveThreshold: appSettings.expensiveThreshold
@@ -120,17 +131,22 @@ Page {
 
                     Label {
                         visible: priceFetcher.hasData && dayOffset === 0
-                        width: parent.width
-                        wrapMode: Text.WordWrap
                         text: priceFetcher.hasNextPrice
-                              ? qsTr("Vaihtuu %1-tasoon klo %2 (%3 snt/kWh)")
+                              ? qsTr("Vaihtuu %1-tasoon")
                                     .arg(page.levelName(page.levelOf(priceFetcher.nextPrice)))
-                                    .arg(Qt.formatDateTime(priceFetcher.nextPriceStart, "HH:mm"))
-                                    .arg(page.fmtPrice(priceFetcher.nextPrice))
                               : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan")
                         color: priceFetcher.hasNextPrice
                                ? page.levelColor(page.levelOf(priceFetcher.nextPrice))
                                : Theme.secondaryHighlightColor
+                        font.pixelSize: Theme.fontSizeSmall
+                    }
+
+                    Label {
+                        visible: priceFetcher.hasData && dayOffset === 0 && priceFetcher.hasNextPrice
+                        text: qsTr("klo %1 · %2 snt/kWh")
+                              .arg(Qt.formatDateTime(priceFetcher.nextPriceStart, "HH:mm"))
+                              .arg(page.fmtPrice(priceFetcher.nextPrice))
+                        color: Theme.secondaryHighlightColor
                         font.pixelSize: Theme.fontSizeSmall
                     }
 
@@ -169,16 +185,6 @@ Page {
                     width: parent.width - 2 * Theme.paddingLarge
                     y: Theme.paddingLarge
                     spacing: Theme.paddingMedium
-
-                    Label {
-                        width: parent.width
-                        text: dayOffset === 0
-                              ? qsTr("Hinta on nyt klo %1")
-                                    .arg(Qt.formatDateTime(new Date(), "HH:mm"))
-                              : qsTr("Huomisen hinnat")
-                        color: Theme.primaryColor
-                        font.pixelSize: Theme.fontSizeMedium
-                    }
 
                     Row {
                         width: parent.width
