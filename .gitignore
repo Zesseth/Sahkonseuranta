@@ -7,6 +7,15 @@ Makefile*
 .qmake.stash
 *.stash
 
+# CMake in-source build artifacts (sfdk build)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+documentation.list
+harbour-sahkonseuranta
+harbour-sahkonseuranta_autogen/
+
 # Qt generated
 moc_*.cpp
 *.moc

@@ -59,7 +59,7 @@ rpm/harbour-sahkonseuranta.yaml — RPM packaging
 ## Building (SailfishOS SDK)
 
 ```bash
-sfdk build -d SailfishOS-4.6.0.15-armv7hl   # Jolla Phone (2026)
+sfdk config target=SailfishOS-4.6.0.13-armv7hl && sfdk build   # Jolla Phone (2026)
 ```
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for full environment setup and

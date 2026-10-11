@@ -44,12 +44,22 @@ sudo apt-get install -y wget curl git build-essential \
 
 ### 3. SailfishOS SDK
 
-Download and run the SailfishOS SDK installer:
+Download and run the SailfishOS SDK installer (see the current link on
+[docs.sailfishos.org/Tools/Sailfish_SDK](https://docs.sailfishos.org/Tools/Sailfish_SDK/);
+SDK 3.13.5 at the time of writing):
 
 ```bash
-wget https://releases.sailfishos.org/sdk/installers/latest/Jolla/latest/SailfishOS-IDE-linux-offline-64-bit.run
-chmod +x SailfishOS-IDE-linux-offline-64-bit.run
-./SailfishOS-IDE-linux-offline-64-bit.run
+wget https://releases.sailfishos.org/sdk/installers/3.13.5/SailfishSDK-3.13.5-linux64-online.run
+chmod +x SailfishSDK-3.13.5-linux64-online.run
+./SailfishSDK-3.13.5-linux64-online.run
+```
+
+The SDK build engine requires Docker (or VirtualBox); on WSL2 use Docker.
+For unattended/headless installation:
+
+```bash
+QT_QPA_PLATFORM=minimal ./SailfishSDK-3.13.5-linux64-online.run \
+    non-interactive=1 accept-licenses=1 build-engine-type=docker
 ```
 
 Add `sfdk` to PATH and install the build target:
@@ -57,7 +67,7 @@ Add `sfdk` to PATH and install the build target:
 ```bash
 echo 'export PATH="$HOME/SailfishOS/lib/sfdk/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
-sfdk config --add-target SailfishOS-4.6.0.15-armv7hl
+sfdk tools install SailfishOS-4.6.0.13-armv7hl
 ```
 
 ### 4. Clone and build
@@ -65,7 +75,7 @@ sfdk config --add-target SailfishOS-4.6.0.15-armv7hl
 ```bash
 git clone https://github.com/Zesseth/Sahkonseuranta.git
 cd Sahkonseuranta
-sfdk build -d SailfishOS-4.6.0.15-armv7hl
+sfdk config target=SailfishOS-4.6.0.13-armv7hl && sfdk build
 ```
 
 A successful build produces
@@ -94,7 +104,7 @@ acceptance criteria.
 |-------|-------|-----|
 | `SailfishApp not found` | Building on the host instead of the SDK | Build with `sfdk build` |
 | `sfdk: command not found` | PATH not set | Add `~/SailfishOS/lib/sfdk/bin` to PATH |
-| Target missing | Target not installed | `sfdk config --add-target SailfishOS-4.6.0.15-armv7hl` |
+| Target missing | Target not installed | `sfdk tools target install SailfishOS-4.6.0.13-armv7hl` |
 | Qt version mismatch | Wrong Qt version | The SDK provides its own Qt; do not mix host Qt into SDK builds |
 
 ## Links

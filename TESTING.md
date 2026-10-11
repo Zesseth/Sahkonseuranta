@@ -53,6 +53,16 @@ the test prints `TIMEOUT` — run it again later.
 
 ### Test runs on record
 
+- **2026-10-11** SDK build + store validation on WSL2 Debian, SailfishOS
+  SDK 3.13.5 (Docker build engine), target SailfishOS-4.6.0.13-armv7hl:
+  `sfdk build` produces `RPMS/harbour-sahkonseuranta-0.1.0-1.armv7hl.rpm`
+  and `sfdk check` reports "Validation succeeded". First-ever successful
+  app build; required fixing the build system (CMake pkg-config lookup
+  for SailfishApp, missing desktop/icon installs, spectacle yaml
+  `Builder`/`PkgConfigBR`/`Requires` setup, X-Nemo-Application-Type,
+  172x172 icon, spec %changelog). Remaining rpmlint warnings:
+  unstripped binary (keeps symbols for device debugging) and unknown
+  license tag (PolyForm Noncommercial is not in rpmlint's list).
 - **2026-10-11** Debian 13 (trixie), Qt 5.15.15, GCC 14:
   PriceFetcher `11 checks, 0 failures`; Settings `13 checks, 0 failures`
 - **2026-10-11** Static checks on the same host: all QML files pass
@@ -69,7 +79,7 @@ the test prints `TIMEOUT` — run it again later.
 The full app (QML included) must be built with the SailfishOS SDK:
 
 ```bash
-sfdk build -d SailfishOS-4.6.0.15-armv7hl
+sfdk config target=SailfishOS-4.6.0.13-armv7hl && sfdk build
 ```
 
 Success criteria:

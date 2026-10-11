@@ -28,7 +28,7 @@
  */
 
 
-#include <SailfishApp.h>
+#include <sailfishapp.h>
 #include <QScopedPointer>
 #include <QQuickView>
 #include <QQmlContext>
