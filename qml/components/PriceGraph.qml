@@ -33,11 +33,15 @@ Item {
             m = Math.min(m, bars[i].price)
         return m
     }
-    readonly property double minV: dataMin < 0
-                                   ? -Math.max(Math.abs(dataMin), Math.abs(dataMax))
-                                   : 0.0
-    readonly property double maxV: Math.max(Math.ceil(dataMax), 1.0)
-    readonly property double pxPerUnit: plotArea.height / Math.max(maxV - Math.floor(minV), 0.001)
+    // Nice-value scaling: top rounds up to the next whole ten
+    // (a max of 28 -> 30, of 10.5 -> 20, of up to 10 -> 10); negative
+    // prices extend the axis downward in steps of five cents. Zero is
+    // always inside the range.
+    readonly property double tickTop: dataMax <= 0.0 ? 0.0 : Math.ceil(dataMax / 10.0) * 10.0
+    readonly property double tickBottom: dataMin >= 0.0 ? 0.0 : Math.floor(dataMin / 5.0) * 5.0
+    readonly property double minV: tickBottom
+    readonly property double maxV: Math.max(tickTop, tickBottom + 10.0)
+    readonly property double pxPerUnit: plotArea.height / Math.max(maxV - minV, 0.001)
     readonly property double zeroFromBottom: (0.0 - minV) * pxPerUnit
 
     // Precomputed x axis ticks: whole hours, every third hour
@@ -50,10 +54,18 @@ Item {
         }
         return ticks
     }
-    // Y axis ticks in whole cents: top, middle and bottom of the range
-    readonly property double tickTop: Math.ceil(maxV)
-    readonly property double tickBottom: Math.floor(minV)
-    readonly property double tickMid: Math.round((tickTop + tickBottom) / 2)
+
+    // Y axis ticks: every five cents below zero, every ten above
+    readonly property var yTicks: {
+        var t = []
+        for (var v = tickBottom; v < 0; v += 5)
+            t.push(v)
+        t.push(0)
+        for (var v2 = 10; v2 <= tickTop; v2 += 10)
+            t.push(v2)
+        return t
+    }
+
 
     function yFromBottom(value) {
         return zeroFromBottom + value * pxPerUnit
@@ -113,27 +125,17 @@ Item {
             color: Theme.secondaryHighlightColor
             font.pixelSize: Theme.fontSizeTiny
         }
-        Label {
-            anchors.top: parent.top
-            anchors.topMargin: Theme.fontSizeTiny + 2
-            anchors.right: parent.right
-            text: graph.tickTop
-            color: Theme.secondaryColor
-            font.pixelSize: Theme.fontSizeTiny
-        }
-        Label {
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            text: graph.tickMid
-            color: Theme.secondaryColor
-            font.pixelSize: Theme.fontSizeTiny
-        }
-        Label {
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            text: graph.tickBottom
-            color: Theme.secondaryColor
-            font.pixelSize: Theme.fontSizeTiny
+
+        Repeater {
+            model: graph.yTicks
+
+            Label {
+                anchors.right: parent.right
+                y: yAxis.height - graph.yFromBottom(modelData) - height / 2
+                text: modelData
+                color: Theme.secondaryColor
+                font.pixelSize: Theme.fontSizeTiny
+            }
         }
     }
 
