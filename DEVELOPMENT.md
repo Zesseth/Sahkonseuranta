@@ -106,6 +106,7 @@ acceptance criteria.
 | `sfdk: command not found` | PATH not set | Add `~/SailfishOS/lib/sfdk/bin` to PATH |
 | Target missing | Target not installed | `sfdk tools target install SailfishOS-4.6.0.13-armv7hl` |
 | Qt version mismatch | Wrong Qt version | The SDK provides its own Qt; do not mix host Qt into SDK builds |
+| CMake flags from the wrong target | In-source CMake cache left over from building another target | `rm -rf CMakeCache.txt CMakeFiles` (and `Makefile`, generated binaries) before `sfdk build` |
 
 ## Links
 
