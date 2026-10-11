@@ -8,7 +8,7 @@ Page {
     readonly property int cardRadius: Theme.paddingLarge
 
     function fmt(v) {
-        return v.toFixed(2).replace(".", ",")
+        return Math.round(v)
     }
 
     function applyCheap(text) {
@@ -66,9 +66,9 @@ Page {
                         id: cheapField
                         width: parent.width
                         label: qsTr("Vihreä, kun hinta on korkeintaan (snt/kWh)")
-                        placeholderText: "2,00"
-                        text: appSettings.cheapThreshold.toFixed(2).replace(".", ",")
-                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        placeholderText: "2"
+                        text: fmt(appSettings.cheapThreshold)
+                        inputMethodHints: Qt.ImhDigitsOnly
                         EnterKey.iconSource: "image://theme/icon-m-enter-next"
                         EnterKey.onClicked: expensiveField.focus = true
                         onActiveFocusChanged: {
@@ -82,9 +82,9 @@ Page {
                         id: expensiveField
                         width: parent.width
                         label: qsTr("Punainen, kun hinta on vähintään (snt/kWh)")
-                        placeholderText: "10,00"
-                        text: appSettings.expensiveThreshold.toFixed(2).replace(".", ",")
-                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                        placeholderText: "10"
+                        text: fmt(appSettings.expensiveThreshold)
+                        inputMethodHints: Qt.ImhDigitsOnly
                         EnterKey.iconSource: "image://theme/icon-m-enter-close"
                         EnterKey.onClicked: focus = false
                         onActiveFocusChanged: {

@@ -7,7 +7,8 @@ const char *kKeyCheap = "cheapThreshold";
 const char *kKeyExpensive = "expensiveThreshold";
 const char *kKeyResolution = "resolution";
 // The green threshold must always be strictly below the red one.
-const double kMinThresholdGap = 0.01;
+// Thresholds are whole cents.
+const double kMinThresholdGap = 1.0;
 }
 
 Settings::Settings(QObject *parent, const QString &organization, const QString &application)
@@ -37,6 +38,7 @@ void Settings::setCheapThreshold(double value)
 {
     if (value < 0.0)
         value = 0.0;
+    value = qRound(value);
     if (m_cheap == value)
         return;
     m_cheap = value;
@@ -50,6 +52,7 @@ void Settings::setCheapThreshold(double value)
 
 void Settings::setExpensiveThreshold(double value)
 {
+    value = qRound(value);
     if (value < m_cheap + kMinThresholdGap)
         value = m_cheap + kMinThresholdGap;
     if (m_expensive == value)
@@ -76,9 +79,12 @@ void Settings::load()
     m_cheap = s.value(QString::fromLatin1(kKeyCheap), 2.0).toDouble();
     if (m_cheap < 0.0)
         m_cheap = 0.0;
+    m_cheap = qRound(m_cheap);
     m_expensive = s.value(QString::fromLatin1(kKeyExpensive), 10.0).toDouble();
     if (m_expensive < m_cheap + kMinThresholdGap)
         m_expensive = m_cheap + kMinThresholdGap;
+    else
+        m_expensive = qRound(m_expensive);
     const int res = s.value(QString::fromLatin1(kKeyResolution), 15).toInt();
     if (res == 15 || res == 60)
         m_resolution = res;

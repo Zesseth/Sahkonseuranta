@@ -35,22 +35,22 @@ int main(int argc, char *argv[])
     check(s.resolution() == 15, "default resolution is 15 min");
 
     s.setCheapThreshold(4.5);
-    check(s.cheapThreshold() == 4.5, "cheap threshold set to 4.5");
+    check(s.cheapThreshold() == 5.0, "cheap threshold rounds to whole cents");
     check(s.expensiveThreshold() == 10.0, "expensive threshold unchanged");
 
     s.setExpensiveThreshold(1.0);
-    check(s.expensiveThreshold() == 4.51, "expensive threshold clamped to cheap + 0.01");
+    check(s.expensiveThreshold() == 6.0, "expensive threshold clamped to cheap + 1");
 
-    s.setExpensiveThreshold(4.50);
-    check(s.expensiveThreshold() == 4.51, "expensive threshold cannot equal cheap");
+    s.setExpensiveThreshold(5.0);
+    check(s.expensiveThreshold() == 6.0, "expensive threshold cannot equal cheap");
 
-    s.setCheapThreshold(6.0);
-    check(s.cheapThreshold() == 6.0, "cheap threshold set to 6.0");
-    check(s.expensiveThreshold() == 6.01, "raising cheap pushes expensive to cheap + 0.01");
+    s.setCheapThreshold(7.0);
+    check(s.cheapThreshold() == 7.0, "cheap threshold set to 7");
+    check(s.expensiveThreshold() == 8.0, "raising cheap pushes expensive to cheap + 1");
 
     s.setCheapThreshold(-1.0);
     check(s.cheapThreshold() == 0.0, "negative cheap threshold clamps to 0");
-    check(s.expensiveThreshold() == 6.01, "lowering cheap leaves expensive unchanged");
+    check(s.expensiveThreshold() == 8.0, "lowering cheap leaves expensive unchanged");
 
     s.setResolution(30);
     check(s.resolution() == 15, "invalid resolution 30 rejected");
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     // A fresh instance must read back the persisted values.
     Settings s2(nullptr, org, appl);
     check(s2.cheapThreshold() == 0.0, "cheap threshold persisted");
-    check(s2.expensiveThreshold() == 6.01, "expensive threshold persisted");
+    check(s2.expensiveThreshold() == 8.0, "expensive threshold persisted");
     check(s2.resolution() == 60, "resolution persisted");
 
     QSettings(org, appl).clear();
