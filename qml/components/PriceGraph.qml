@@ -132,7 +132,10 @@ Item {
             Label {
                 anchors.right: parent.right
                 anchors.rightMargin: Theme.paddingSmall
-                y: yAxis.height - graph.yFromBottom(modelData) - height / 2
+                // keep the number fully inside the axis column even at
+                // the very top and bottom of the value range
+                y: Math.min(Math.max(yAxis.height - graph.yFromBottom(modelData) - height / 2, 0),
+                            yAxis.height - height)
                 text: modelData
                 color: Theme.secondaryColor
                 font.pixelSize: Theme.fontSizeTiny
