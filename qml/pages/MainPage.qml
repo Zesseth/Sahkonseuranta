@@ -29,7 +29,7 @@ Page {
             return qsTr("Halpa")
         if (level === 2)
             return qsTr("Kallis")
-        return qsTr("Normaali")
+        return qsTr("Keskitaso")
     }
 
     function levelColor(level) {
