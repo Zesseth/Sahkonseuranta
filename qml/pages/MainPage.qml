@@ -17,6 +17,31 @@ Page {
         return v.toFixed(2).replace(".", ",")
     }
 
+    // Price levels follow the thresholds configured in Settings
+    function levelOf(price) {
+        if (price <= appSettings.cheapThreshold)
+            return 0
+        if (price >= appSettings.expensiveThreshold)
+            return 2
+        return 1
+    }
+
+    function levelName(level) {
+        if (level === 0)
+            return qsTr("Halpa")
+        if (level === 2)
+            return qsTr("Kallis")
+        return qsTr("Normaali")
+    }
+
+    function levelColor(level) {
+        if (level === 0)
+            return "#2ecc71"
+        if (level === 2)
+            return "#e74c3c"
+        return "#f1c40f"
+    }
+
     SilicaFlickable {
         id: flick
         anchors.fill: parent
@@ -86,14 +111,26 @@ Page {
 
                     Label {
                         visible: priceFetcher.hasData && dayOffset === 0
+                        text: qsTr("Taso nyt: %1")
+                              .arg(page.levelName(page.levelOf(priceFetcher.displayPrice)))
+                        color: page.levelColor(page.levelOf(priceFetcher.displayPrice))
+                        font.pixelSize: Theme.fontSizeMedium
+                        font.bold: true
+                    }
+
+                    Label {
+                        visible: priceFetcher.hasData && dayOffset === 0
                         width: parent.width
                         wrapMode: Text.WordWrap
                         text: priceFetcher.hasNextPrice
-                              ? qsTr("Taso pysyy klo %1 asti, jolloin hinta on %2")
+                              ? qsTr("Vaihtuu %1-tasoon klo %2 (%3 snt/kWh)")
+                                    .arg(page.levelName(page.levelOf(priceFetcher.nextPrice)))
                                     .arg(Qt.formatDateTime(priceFetcher.nextPriceStart, "HH:mm"))
                                     .arg(page.fmtPrice(priceFetcher.nextPrice))
                               : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan")
-                        color: Theme.secondaryHighlightColor
+                        color: priceFetcher.hasNextPrice
+                               ? page.levelColor(page.levelOf(priceFetcher.nextPrice))
+                               : Theme.secondaryHighlightColor
                         font.pixelSize: Theme.fontSizeSmall
                     }
 
