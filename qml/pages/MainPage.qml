@@ -61,6 +61,15 @@ Page {
     // Cached per binding refresh so the labels can null-check safely
     readonly property var nextLevel: nextLevelBar()
 
+    // Start time of the ongoing price period: the quarter start at
+    // 15 min resolution, the hour start at 60 min
+    function currentPeriodStart() {
+        var i = priceFetcher.nowIndex
+        if (i < 0 || i >= priceFetcher.bars.length)
+            return ""
+        return Qt.formatDateTime(priceFetcher.bars[i].start, "HH:mm")
+    }
+
     SilicaFlickable {
         id: flick
         anchors.fill: parent
@@ -125,7 +134,7 @@ Page {
                         visible: priceFetcher.hasData
                         text: dayOffset === 0
                               ? qsTr("Hinta on nyt klo %1")
-                                    .arg(Qt.formatDateTime(new Date(), "HH:mm"))
+                                    .arg(page.currentPeriodStart())
                               : qsTr("Huomisen hinnat")
                         color: Theme.primaryColor
                         font.pixelSize: Theme.fontSizeMedium
