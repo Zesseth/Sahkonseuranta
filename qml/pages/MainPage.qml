@@ -51,22 +51,24 @@ Page {
                 title: dayOffset === 0 ? qsTr("Pörssisähkö tänään") : qsTr("Pörssisähkö huomenna")
             }
 
-            // Price card: ball + current price, centered
+            // Price card: ball + current price on the left
             Rectangle {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                height: priceCardColumn.height + 2 * Theme.paddingLarge
+                height: priceRow.height + 2 * Theme.paddingLarge
                 radius: page.cardRadius
                 color: page.cardColor
                 visible: (priceFetcher.hasData && dayOffset === 0) || priceFetcher.loading
 
-                Column {
-                    id: priceCardColumn
-                    anchors.centerIn: parent
-                    spacing: Theme.paddingSmall
+                Row {
+                    id: priceRow
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    anchors.leftMargin: Theme.paddingLarge
+                    spacing: Theme.paddingLarge
+                    visible: priceFetcher.hasData && dayOffset === 0
 
                     PriceBall {
-                        visible: priceFetcher.hasData && dayOffset === 0
                         price: priceFetcher.displayPrice
                         cheapThreshold: appSettings.cheapThreshold
                         expensiveThreshold: appSettings.expensiveThreshold
@@ -74,20 +76,19 @@ Page {
                     }
 
                     Label {
-                        visible: priceFetcher.hasData && dayOffset === 0
+                        anchors.verticalCenter: parent.verticalCenter
                         text: qsTr("Nyt")
                         color: Theme.secondaryHighlightColor
-                        font.pixelSize: Theme.fontSizeSmall
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        font.pixelSize: Theme.fontSizeMedium
                     }
+                }
 
-                    Label {
-                        visible: !priceFetcher.hasData
-                        text: priceFetcher.loading ? qsTr("Ladataan...") : qsTr("Ei tietoja")
-                        color: Theme.secondaryColor
-                        font.pixelSize: Theme.fontSizeLarge
-                        anchors.horizontalCenter: parent.horizontalCenter
-                    }
+                Label {
+                    visible: !priceFetcher.hasData
+                    anchors.centerIn: parent
+                    text: priceFetcher.loading ? qsTr("Ladataan...") : qsTr("Ei tietoja")
+                    color: Theme.secondaryColor
+                    font.pixelSize: Theme.fontSizeLarge
                 }
             }
 

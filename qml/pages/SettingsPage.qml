@@ -45,10 +45,12 @@ Page {
             Rectangle {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
+                height: thresholdColumn.height + 2 * Theme.paddingLarge
                 radius: settingsPage.cardRadius
                 color: settingsPage.cardColor
 
                 Column {
+                    id: thresholdColumn
                     spacing: Theme.paddingMedium
                     width: parent.width - 2 * Theme.paddingLarge
                     anchors.centerIn: parent
@@ -98,10 +100,12 @@ Page {
             Rectangle {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
+                height: resolutionColumn.height + 2 * Theme.paddingLarge
                 radius: settingsPage.cardRadius
                 color: settingsPage.cardColor
 
                 Column {
+                    id: resolutionColumn
                     spacing: Theme.paddingMedium
                     width: parent.width - 2 * Theme.paddingLarge
                     anchors.centerIn: parent

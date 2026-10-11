@@ -10,7 +10,7 @@ Name:       harbour-sahkonseuranta
 
 Summary:    Electricity spot price tracking
 Version:    0.1.0
-Release:    4
+Release:    5
 Group:      Qt/Qt
 License:    PolyForm-Noncommercial-1.0.0
 URL:        https://github.com/Zesseth/Sahkonseuranta
@@ -70,24 +70,3 @@ desktop-file-install --delete-original       \
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 # >> files
 # << files
-
-%changelog
-* Sun Oct 11 2026 Zesseth <jlahtela@users.noreply.github.com> 0.1.0-4
-- Keep the green threshold strictly below the red one (minimum 0.01
-  gap); raising the green pushes the red up, the settings page shows
-  the enforced values.
-- Make the PriceFetcher test independent of the time of day: the API
-  serves a rolling 48 h window which may cut the early hours of the
-  local day.
-
-* Sun Oct 11 2026 Zesseth <jlahtela@users.noreply.github.com> 0.1.0-3
-- Fix Settings page failing to load: Silica TextField has no
-  accepted signal; Enter key and focus change handlers already
-  cover value commits, so drop the invalid onAccepted bindings.
-
-* Sun Oct 11 2026 Zesseth <jlahtela@users.noreply.github.com> 0.1.0-2
-- Fix white screen on launch: harbour-sahkonseuranta.qml was missing
-  the pages import, so MainPage could not be resolved.
-
-* Sun Oct 11 2026 Zesseth <jlahtela@users.noreply.github.com> 0.1.0-1
-- Initial RPM package of Sähkönseuranta.
