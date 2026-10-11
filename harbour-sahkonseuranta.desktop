@@ -2,8 +2,8 @@
 Type=Application
 Icon=harbour-sahkonseuranta
 Exec=harbour-sahkonseuranta
-Name=Sähkönseuranta
-Comment=Sähkön pörssihinnan seuranta
+Name=Electricity Price Tracker
+Comment=Track Finnish electricity spot prices
 
 [X-Sailjail]
 OrganizationName=fi.zesseth

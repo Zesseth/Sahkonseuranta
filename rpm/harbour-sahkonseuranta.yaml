@@ -1,5 +1,5 @@
 Name: harbour-sahkonseuranta
-Summary: Sähkön pörssihinnan seuranta
+Summary: Electricity spot price tracking
 Version: 0.1.0
 Release: 1
 Group: Applications/System
@@ -9,9 +9,9 @@ URL: https://github.com/Zesseth/Sahkonseuranta
 Sources:
   - '%{name}-%{version}.tar.bz2'
 Description: |
-  Seuraa Suomen sähkön pörssihintaa 15 minuutin tai tunnin
-  tarkkuudella palkkigraafilla. Hinnat haetaan
-  porssisahko.net:n avoimesta rajapinnasta.
+  Track Finnish electricity spot prices with 15-minute or 1-hour
+  precision bar chart. Prices are fetched from
+  porssisahko.net open API.
 Configure: none
 Builder: none
 NoFiles: 0
