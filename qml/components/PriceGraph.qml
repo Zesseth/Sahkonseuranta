@@ -24,6 +24,13 @@ Item {
     // Track the plot width explicitly to avoid binding loops with plotArea
     property double plotAreaWidth: 200
     onWidthChanged: plotAreaWidth = width - yAxisWidth
+    // The initial scroll to "now" happens when bars arrive, which can
+    // be before the final layout width is known; re-align once the
+    // width settles so the view really starts at the current bar.
+    onPlotAreaWidthChanged: {
+        if (bars.length > 0 && nowIndex >= 0)
+            scrollToNow()
+    }
     readonly property int xAxisHeight: 22
     readonly property int yAxisWidth: 44
 
@@ -51,13 +58,13 @@ Item {
     readonly property double pxPerUnit: plotArea.height / Math.max(maxV - minV, 0.001)
     readonly property double zeroFromBottom: (0.0 - minV) * pxPerUnit
 
-    // Precomputed x axis ticks: whole hours, every third hour; the
-    // midnight tick carries the weekday abbreviation of the new day
+    // Precomputed x axis ticks: every whole hour; the midnight tick
+    // carries the weekday abbreviation of the new day
     readonly property var hourTicks: {
         var ticks = []
         for (var i = 0; i < bars.length; ++i) {
             var st = bars[i].start
-            if (st.getMinutes() === 0 && st.getHours() % 3 === 0)
+            if (st.getMinutes() === 0)
                 ticks.push({ i: i, hour: st.getHours(), day: st.getHours() === 0 ? weekdayAbbr(st) : "" })
         }
         return ticks
@@ -104,12 +111,32 @@ Item {
     }
 
     // Show the current bar as the first bar of the view so the user
-    // scrolls forward from now
-    function scrollToNow() {
-        if (nowIndex < 0 || bars.length === 0)
+    // scrolls forward from now. Accepts the index as an argument because
+    // our own nowIndex binding may not have re-evaluated yet when the
+    // caller's onBarsChanged fires.
+    property int pendingNowIndex: -1
+    function scrollToNow(idx) {
+        var target = (idx === undefined) ? nowIndex : idx
+        if (target < 0 || bars.length === 0)
             return
-        var x = barX(nowIndex)
-        scroll.contentX = Math.max(0, Math.min(x, scroll.contentWidth - scroll.width))
+        // Defer: at data-arrival time the layout bindings (bar width,
+        // content width) may not have settled yet, which used to clamp
+        // the view to the start of the data instead of "now".
+        pendingNowIndex = target
+        scrollTimer.restart()
+    }
+
+    Timer {
+        id: scrollTimer
+        interval: 50
+        onTriggered: {
+            if (graph.pendingNowIndex < 0 || graph.bars.length === 0)
+                return
+            var bw = graph.barWidth
+            var x = graph.pendingNowIndex * bw
+            var maxX = graph.bars.length * bw - scroll.width
+            scroll.contentX = Math.max(0, Math.min(x, Math.max(0, maxX)))
+        }
     }
 
     // Scroll to the first bar at or after the given time

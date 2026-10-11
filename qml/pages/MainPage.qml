@@ -316,7 +316,9 @@ Page {
                         nowIndex: priceFetcher.allNowIndex
                         cheapThreshold: appSettings.cheapThreshold
                         expensiveThreshold: appSettings.expensiveThreshold
-                        onBarsChanged: scrollToNow()
+                        // Pass the index directly: graph.nowIndex may
+                        // not have re-evaluated yet when this fires
+                        onBarsChanged: scrollToNow(priceFetcher.allNowIndex)
                     }
                 }
             }
