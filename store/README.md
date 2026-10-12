@@ -8,8 +8,9 @@ Contents:
 
 - `description-fi.md` - the Finnish store description (paste into the
   Harbour submission form)
-- `screenshots/` - store screenshots at the emulator's native
-  resolution (720x1600). Capture over SSH with the lipstick screenshot
+- `screenshots/` - store screenshots at 1080x2400 (the Harbour form
+  requires at least 1080 px width; the emulator's native 720x1600
+  capture is upscaled 1.5x with Lanczos - see the release checklist). Capture over SSH with the lipstick screenshot
   API (needs root on the session bus; VirtualBox's own capture is
   only half resolution - do not use it for the store):
 
@@ -33,9 +34,18 @@ What does **not** belong here:
 ## Release checklist (issue #4)
 
 1. `sfdk check` passes on the armv7hl build
-2. At least 2 screenshots in `screenshots/` (main page + settings)
+2. At least 2 screenshots in `screenshots/` (main page + settings),
+   each at least 1080 px wide
 3. Description text finalized in `description-fi.md`
 4. `Version` in `rpm/harbour-sahkonseuranta.yaml` in sync with the
-   description (first store release is 1.0.0)
-5. Upload to Jolla Harbour: description, screenshots, category
-   (Utilities), the armv7hl RPM, license "AGPL-3.0"
+   description (first store release is 1.0.0); **set `Release: 1`**
+   for the store build - the development counter (bumped for every
+   emulator install) is not used in store builds and is left behind
+5. Upload to Jolla Harbour:
+   - description from `description-fi.md`
+   - screenshots from `screenshots/`
+   - category (Utilities), license "AGPL-3.0"
+   - privacy policy URL:
+     https://github.com/Zesseth/Sahkonseuranta/blob/main/PRIVACY.md
+   - contact email: jesse@lahtela.email
+   - the armv7hl RPM (attached to the matching GitHub Release)
