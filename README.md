@@ -6,7 +6,8 @@ resolution. Target device: Jolla Phone (2026), release channel: Jolla
 Store.
 
 The user interface is in Finnish; the codebase and documentation are in
-English.
+English. The app collects no user data - see
+[PRIVACY.md](PRIVACY.md).
 
 ## Features
 
