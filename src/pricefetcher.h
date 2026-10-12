@@ -18,9 +18,9 @@ class PriceFetcher : public QObject
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
     Q_PROPERTY(QVariantList prices READ prices NOTIFY pricesChanged)
     Q_PROPERTY(QVariantList bars READ bars NOTIFY barsChanged)
-    // The chart window starting at the current price period (history
-    // before "now" is dropped on every refresh); bars covers the
-    // selected day and feeds the day statistics
+    // The chart window covering the current day onward (yesterday is
+    // dropped on every refresh); bars covers the selected day and
+    // feeds the day statistics
     Q_PROPERTY(QVariantList allBars READ allBars NOTIFY allBarsChanged)
     Q_PROPERTY(int allNowIndex READ allNowIndex NOTIFY allBarsChanged)
     Q_PROPERTY(double currentPrice READ currentPrice NOTIFY currentPriceChanged)
