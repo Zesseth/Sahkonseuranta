@@ -272,7 +272,9 @@ void PriceFetcher::buildBars()
         }
     }
 
-    // Index of "now" in the full window (for the scrollable chart)
+    // Index of "now" in the chart window; the chart starts at the
+    // current period, so history before "now" is dropped on every
+    // refresh and the first bar is always the ongoing one
     {
         const int periodMin = (m_resolution == 60) ? 60 : 15;
         for (int i = 0; i < m_allBars.size(); ++i) {
@@ -280,7 +282,9 @@ void PriceFetcher::buildBars()
             QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
             QDateTime end = start.addSecs(periodMin * 60);
             if (start <= now && now < end) {
-                m_allNowIndex = i;
+                if (i > 0)
+                    m_allBars = m_allBars.mid(i);
+                m_allNowIndex = m_allBars.isEmpty() ? -1 : 0;
                 break;
             }
         }

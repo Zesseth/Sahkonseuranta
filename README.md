@@ -22,10 +22,11 @@ English.
 - The displayed price follows the chosen resolution: the ongoing spot
   price at 15 min, the ongoing hour's average at 1 h; the clock line
   shows the start time of the ongoing price period
-- Scrollable bar chart of everything the API returns (today +
-  tomorrow), colored with the same thresholds: current bar marked
-  with a bright border and an axis diamond, dashed threshold lines,
-  gray grid, whole-cent y axis, whole-hour x axis
+- Scrollable bar chart starting at the current price period (history
+  before "now" is dropped on every refresh), colored with the same
+  thresholds: current bar marked with a bright border and an axis
+  diamond, dashed threshold lines, gray grid, whole-cent y axis,
+  whole-hour x axis
 - Stats row: average / min / max for the day
 - Cover page showing the current price
 - Automatic refresh every 30 minutes

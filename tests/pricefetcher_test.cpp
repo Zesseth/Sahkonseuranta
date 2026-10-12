@@ -77,10 +77,18 @@ int main(int argc, char *argv[])
         check(f.avgPrice() <= f.maxPrice() + 0.0001, "avg <= max");
         check(f.nowUntil().isValid() && f.nowUntil() > QDateTime::currentDateTime(),
               "forecast: current period end is in the future");
-        check(f.allBars().size() >= bars.size(),
-              "allBars covers at least the selected day");
-        check(f.allNowIndex() >= 0 && f.allNowIndex() < f.allBars().size(),
-              "allNowIndex points inside the full window");
+        // The chart window starts at the current price period: history
+        // before "now" is dropped on every refresh. One minute of slack
+        // covers a period boundary crossed between fetch and check.
+        {
+            const QVariantList all = f.allBars();
+            check(all.size() > 0, "chart window is not empty");
+            check(f.allNowIndex() == 0, "allNowIndex is the first bar");
+            QDateTime st = all.at(0).toMap().value("start").toDateTime();
+            QDateTime now2 = QDateTime::currentDateTime();
+            check(st <= now2 && now2 < st.addSecs(15 * 60 + 60),
+                  "first chart bar covers the current period");
+        }
         if (f.hasNextPrice()) {
             check(f.nextPriceStart().isValid() && f.nextPriceStart() >= f.nowUntil(),
                   "forecast: next price change is after the current period ends");
@@ -119,6 +127,18 @@ int main(int argc, char *argv[])
             double barPrice = bars.at(f.nowIndex()).toMap().value("price").toDouble();
             check(f.displayPrice() == barPrice,
                   "display price equals the ongoing hour bar at 60 min");
+        }
+        // The hourly chart window also starts at the current period.
+        {
+            const QVariantList all = f.allBars();
+            check(all.size() > 0 && f.allNowIndex() == 0,
+                  "hourly chart window starts at the current period");
+            if (all.size() > 0) {
+                QDateTime st = all.at(0).toMap().value("start").toDateTime();
+                QDateTime now2 = QDateTime::currentDateTime();
+                check(st <= now2 && now2 < st.addSecs(60 * 60 + 60),
+                      "first hourly chart bar covers the current period");
+            }
         }
         printf("\n%d checks, %d failures\n", g_checks, g_failures);
         exit(g_failures == 0 ? 0 : 1);
