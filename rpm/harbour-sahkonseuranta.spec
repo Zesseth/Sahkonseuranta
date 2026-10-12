@@ -64,10 +64,14 @@ desktop-file-install --delete-original       \
 
 %files
 %defattr(-,root,root,-)
-%license LICENSE
 %{_bindir}/%{name}
 %{_datadir}/%{name}
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 # >> files
 # << files
+
+%changelog
+* Sun Oct 12 2026 Zesseth <jlahtela@users.noreply.github.com> 1.0.0-1
+- First store release candidate: AGPL-3.0-or-later relicense, redesigned
+  main page with the scrollable chart, configurable price thresholds

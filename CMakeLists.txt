@@ -35,6 +35,9 @@ target_link_libraries(harbour-sahkonseuranta
 
 install(TARGETS harbour-sahkonseuranta DESTINATION bin)
 install(DIRECTORY qml DESTINATION share/harbour-sahkonseuranta)
+# The license must ship inside the app's own data directory; the Jolla
+# Store validator rejects /usr/share/licenses and /usr/share/doc paths
+install(FILES LICENSE DESTINATION share/harbour-sahkonseuranta)
 install(FILES harbour-sahkonseuranta.desktop DESTINATION share/applications)
 install(FILES icons/86x86/harbour-sahkonseuranta.png
     DESTINATION share/icons/hicolor/86x86/apps)
