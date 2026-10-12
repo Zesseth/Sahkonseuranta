@@ -20,27 +20,34 @@ const int kRequestTimeoutMs = 20 * 1000;
 // seconds after it so the app always has the new period's price
 const int kBoundaryOffsetMs = 5 * 1000;
 
+QString weekdayAbbr(const QDate &d)
+{
+    static const char *const names[] = { "Su", "Ma", "Ti", "Ke", "To", "Pe", "La" };
+    return QString::fromLatin1(names[d.dayOfWeek() - 1]);
+}
+
 // Display text for a moment in the chart window. A plain "klo HH:mm"
 // is used when the moment is the nearest future occurrence of that
-// clock time; when a reader could place it on the wrong day, the day
-// is told ("huomenna klo 13:00", "ylihuomenna klo 00:45").
+// clock time; when a reader could place it on the wrong day, the
+// weekday abbreviation follows the time ("klo 13:00 Ti",
+// "klo 00:45 Ke").
 QString formatMomentText(const QDateTime &t)
 {
     if (!t.isValid())
         return QString();
-    const QString timeText = QStringLiteral("klo ") + t.toString(QStringLiteral("HH:mm"));
+    QString s = QStringLiteral("klo ") + t.toString(QStringLiteral("HH:mm"));
     const QDate today = QDate::currentDate();
     const QDate d = t.date();
     if (d == today)
-        return timeText;
+        return s;
     if (d == today.addDays(1)) {
         // Today's occurrence of the same clock time has already passed,
         // so the plain time unambiguously means the coming one
         if (t.time() < QTime::currentTime())
-            return timeText;
-        return QStringLiteral("huomenna ") + timeText;
+            return s;
+        return s + QStringLiteral(" ") + weekdayAbbr(d);
     }
-    return QStringLiteral("ylihuomenna ") + timeText;
+    return s + QStringLiteral(" ") + weekdayAbbr(d);
 }
 // Safety clamps so a clock jump can never leave the refresh timer
 // without a valid interval (and thus without ever fetching)
