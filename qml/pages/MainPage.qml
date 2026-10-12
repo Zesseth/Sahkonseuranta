@@ -195,7 +195,7 @@ Page {
                 wrapMode: Text.WordWrap
             }
 
-            // Box 2: price now at clock + period, and today's stats
+            // Box 2: price now at clock + period, and chart window stats
             Rectangle {
                 id: statsCard
                 x: Theme.horizontalPageMargin

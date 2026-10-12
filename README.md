@@ -27,7 +27,8 @@ English.
   thresholds: current bar marked with a bright border and an axis
   diamond, dashed threshold lines, gray grid, whole-cent y axis,
   whole-hour x axis
-- Stats row: average / min / max for the day
+- Stats row: average / min / max over the chart window (the same
+  prices the graph shows)
 - Cover page showing the current price
 - Automatic refresh every 30 minutes
 - Prices fetched from the open

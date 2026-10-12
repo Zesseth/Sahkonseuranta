@@ -253,27 +253,11 @@ void PriceFetcher::buildBars()
     m_allBars = (m_resolution == 60) ? aggregateHourly(sorted) : sorted;
 
     QVariantList dayPrices;
-    double sum = 0.0;
-    int n = 0;
     for (int i = 0; i < sorted.size(); ++i) {
         QVariantMap entry = sorted.at(i).toMap();
         QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
-        if (start.date() == day) {
+        if (start.date() == day)
             dayPrices.append(entry);
-            sum += entry.value(QStringLiteral("price")).toDouble();
-            n++;
-        }
-    }
-
-    if (n > 0) {
-        m_avg = sum / n;
-        m_min = dayPrices.first().toMap().value(QStringLiteral("price")).toDouble();
-        m_max = m_min;
-        for (const QVariant &v : dayPrices) {
-            double p = v.toMap().value(QStringLiteral("price")).toDouble();
-            if (p < m_min) m_min = p;
-            if (p > m_max) m_max = p;
-        }
     }
 
     if (m_resolution == 60)
@@ -305,7 +289,6 @@ void PriceFetcher::buildBars()
     // The chart window starts at the current price period: history
     // before "now" is dropped on every refresh, so the first bar is
     // always the ongoing one and there is nothing to scroll back to.
-    // The day statistics still cover the full day.
     {
         const int periodMin = (m_resolution == 60) ? 60 : 15;
         for (int i = 0; i < m_allBars.size(); ++i) {
@@ -318,6 +301,27 @@ void PriceFetcher::buildBars()
                 m_allNowIndex = m_allBars.isEmpty() ? -1 : 0;
                 break;
             }
+        }
+    }
+
+    // Statistics over the chart window so the numbers always match what
+    // the graph shows: every value can be found in the chart
+    {
+        double sum = 0.0;
+        int n = 0;
+        for (int i = 0; i < m_allBars.size(); ++i) {
+            const double p = m_allBars.at(i).toMap().value(QStringLiteral("price")).toDouble();
+            if (n == 0 || p < m_min) m_min = p;
+            if (n == 0 || p > m_max) m_max = p;
+            sum += p;
+            n++;
+        }
+        if (n > 0) {
+            m_avg = sum / n;
+        } else {
+            m_avg = 0.0;
+            m_min = 0.0;
+            m_max = 0.0;
         }
     }
 

@@ -27,6 +27,8 @@ class PriceFetcher : public QObject
     // Price shown on the front page: the spot price at 15 min resolution,
     // or the average of the ongoing hour at 60 min resolution.
     Q_PROPERTY(double displayPrice READ displayPrice NOTIFY barsChanged)
+    // Statistics over the chart window (current period onward), so the
+    // numbers always match what the chart shows
     Q_PROPERTY(double avgPrice READ avgPrice NOTIFY statsChanged)
     Q_PROPERTY(double minPrice READ minPrice NOTIFY statsChanged)
     Q_PROPERTY(double maxPrice READ maxPrice NOTIFY statsChanged)

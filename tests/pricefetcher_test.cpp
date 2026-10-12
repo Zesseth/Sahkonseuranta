@@ -89,6 +89,21 @@ int main(int argc, char *argv[])
             QDateTime now2 = QDateTime::currentDateTime();
             check(st <= now2 && now2 < st.addSecs(15 * 60 + 60),
                   "first chart bar covers the current period");
+            // The stats box must describe the same prices the chart shows
+            double sum = 0.0;
+            int n = 0;
+            double mn = 0.0, mx = 0.0;
+            for (int i = 0; i < all.size(); ++i) {
+                const double p = all.at(i).toMap().value("price").toDouble();
+                if (n == 0 || p < mn) mn = p;
+                if (n == 0 || p > mx) mx = p;
+                sum += p;
+                n++;
+            }
+            check(n > 0 && qAbs(f.avgPrice() - sum / n) < 0.005,
+                  "avg matches the chart window");
+            check(qAbs(f.minPrice() - mn) < 0.005, "min matches the chart window");
+            check(qAbs(f.maxPrice() - mx) < 0.005, "max matches the chart window");
         }
         if (f.hasNextPrice()) {
             check(f.nextPriceStart().isValid() && f.nextPriceStart() >= f.nowUntil(),
