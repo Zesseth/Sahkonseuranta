@@ -20,16 +20,27 @@ const int kRequestTimeoutMs = 20 * 1000;
 // seconds after it so the app always has the new period's price
 const int kBoundaryOffsetMs = 5 * 1000;
 
-// Display text for a moment in the chart window: plain "klo HH:mm"
-// for today, "huomenna klo HH:mm" when the moment is tomorrow (the
-// window never reaches past tomorrow after the tail trim)
+// Display text for a moment in the chart window. A plain "klo HH:mm"
+// is used when the moment is the nearest future occurrence of that
+// clock time; when a reader could place it on the wrong day, the day
+// is told ("huomenna klo 13:00", "ylihuomenna klo 00:45").
 QString formatMomentText(const QDateTime &t)
 {
     if (!t.isValid())
         return QString();
-    if (t.date() == QDate::currentDate())
-        return QStringLiteral("klo ") + t.toString(QStringLiteral("HH:mm"));
-    return QStringLiteral("huomenna klo ") + t.toString(QStringLiteral("HH:mm"));
+    const QString timeText = QStringLiteral("klo ") + t.toString(QStringLiteral("HH:mm"));
+    const QDate today = QDate::currentDate();
+    const QDate d = t.date();
+    if (d == today)
+        return timeText;
+    if (d == today.addDays(1)) {
+        // Today's occurrence of the same clock time has already passed,
+        // so the plain time unambiguously means the coming one
+        if (t.time() < QTime::currentTime())
+            return timeText;
+        return QStringLiteral("huomenna ") + timeText;
+    }
+    return QStringLiteral("ylihuomenna ") + timeText;
 }
 // Safety clamps so a clock jump can never leave the refresh timer
 // without a valid interval (and thus without ever fetching)
@@ -103,13 +114,7 @@ QString PriceFetcher::windowSpanText() const
     const QDateTime lastStart = m_allBars.last().toMap().value(QStringLiteral("start")).toDateTime();
     const int periodMin = (m_resolution == 60) ? 60 : 15;
     const QDateTime lastEnd = lastStart.addSecs(periodMin * 60);
-    // After the tail trim the window ends at the end of tomorrow;
-    // format that moment as 24:00 instead of 00:00
-    QString endText = lastEnd.toString(QStringLiteral("HH:mm"));
-    if (lastEnd.time() == QTime(0, 0))
-        endText = QStringLiteral("24:00");
-    return QStringLiteral("klo ") + first.toString(QStringLiteral("HH:mm"))
-            + QStringLiteral("\u2013") + endText;
+    return formatMomentText(first) + QStringLiteral("\u2013") + formatMomentText(lastEnd);
 }
 int PriceFetcher::resolution() const { return m_resolution; }
 int PriceFetcher::nowIndex() const { return m_nowIndex; }
@@ -332,14 +337,6 @@ void PriceFetcher::buildBars()
                 break;
             }
         }
-        // The API window is a rolling 48 h and can extend up to an hour
-        // past the following midnight; trim so the chart ends exactly
-        // at the end of tomorrow and the data never crosses a second
-        // day boundary
-        const QDateTime windowEnd = QDateTime(day.addDays(2), QTime(0, 0));
-        while (!m_allBars.isEmpty()
-               && m_allBars.last().toMap().value(QStringLiteral("start")).toDateTime() >= windowEnd)
-            m_allBars.removeLast();
     }
 
     // Statistics over the chart window so the numbers always match what

@@ -108,11 +108,12 @@ int main(int argc, char *argv[])
             check(!f.minTimeText().isEmpty(), "min time text set");
             check(!f.maxTimeText().isEmpty(), "max time text set");
             check(!f.windowSpanText().isEmpty(), "window span text set");
-            // The rolling 48 h API window is trimmed so the data never
-            // crosses past the end of tomorrow
+            // The rolling 48 h API window extends about an hour past the
+            // end of tomorrow (the UTC publication boundary); the data
+            // is kept - future prices are never cut
             QDateTime lastStart = all.at(all.size() - 1).toMap().value("start").toDateTime();
-            check(lastStart < QDateTime(QDate::currentDate().addDays(2), QTime(0, 0)),
-                  "chart ends within tomorrow");
+            check(lastStart < QDateTime(QDate::currentDate().addDays(2), QTime(1, 0)),
+                  "chart extends at most an hour past the end of tomorrow");
         }
         if (f.hasNextPrice()) {
             check(f.nextPriceStart().isValid() && f.nextPriceStart() >= f.nowUntil(),
