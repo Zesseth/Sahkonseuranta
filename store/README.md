@@ -10,7 +10,9 @@ Contents:
   Harbour submission form)
 - `screenshots/` - store screenshots at 1080x2400 (the Harbour form
   requires at least 1080 px width; the emulator's native 720x1600
-  capture is upscaled 1.5x with Lanczos - see the release checklist). Capture over SSH with the lipstick screenshot
+  capture is upscaled 1.5x with Lanczos and finished with a light
+  unsharp mask so text stays crisp). `cover-1080x540.png` is the
+  optional Harbour cover image. Capture over SSH with the lipstick screenshot
   API (needs root on the session bus; VirtualBox's own capture is
   only half resolution - do not use it for the store):
 
