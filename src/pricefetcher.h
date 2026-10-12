@@ -64,8 +64,10 @@ public:
     QDateTime nextPriceStart() const;
 
     Q_INVOKABLE void refresh();
-    // Pause the 30-minute auto-refresh while the application is not
-    // active (background/cover), so a suspended device is not woken up
+    // While the app is active the prices are fetched right after every
+    // quarter-hour boundary (when the spot price changes) and
+    // immediately on activation; while in the background the
+    // auto-refresh is paused so a suspended device is not woken up
     void setAutoRefreshEnabled(bool enabled);
 
 signals:
@@ -88,6 +90,9 @@ private slots:
 
 private:
     void buildBars();
+    // Time the next auto-refresh a few seconds after the next
+    // quarter-hour boundary; clamped to a valid interval
+    void scheduleNextRefresh();
     // Setters emit their NOTIFY signal only when the value changes
     void setLoading(bool loading);
     void setErrorString(const QString &err);
@@ -95,6 +100,7 @@ private:
     QNetworkAccessManager *m_nam;
     QNetworkReply *m_reply = nullptr;
     QTimer *m_refreshTimer = nullptr;
+    bool m_autoRefresh = true;
     bool m_loading = false;
     QString m_error;
     QVariantList m_prices;

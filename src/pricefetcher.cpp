@@ -13,10 +13,16 @@
 
 namespace {
 const char *kLatestPricesUrl = "https://api.porssisahko.net/v2/latest-prices.json";
-const int kAutoRefreshMs = 30 * 60 * 1000;
 // Abort a request that has not finished within this time so a hung
 // connection cannot leave the app stuck in the loading state
 const int kRequestTimeoutMs = 20 * 1000;
+// The spot price changes at each quarter-hour boundary; fetch a few
+// seconds after it so the app always has the new period's price
+const int kBoundaryOffsetMs = 5 * 1000;
+// Safety clamps so a clock jump can never leave the refresh timer
+// without a valid interval (and thus without ever fetching)
+const int kMinRefreshMs = 10 * 1000;
+const int kMaxRefreshMs = 15 * 60 * 1000 + kBoundaryOffsetMs;
 }
 
 PriceFetcher::PriceFetcher(QObject *parent)
@@ -24,17 +30,36 @@ PriceFetcher::PriceFetcher(QObject *parent)
     , m_nam(new QNetworkAccessManager(this))
 {
     m_refreshTimer = new QTimer(this);
-    m_refreshTimer->setInterval(kAutoRefreshMs);
+    m_refreshTimer->setSingleShot(true);
     connect(m_refreshTimer, &QTimer::timeout, this, &PriceFetcher::refresh);
-    m_refreshTimer->start();
+    scheduleNextRefresh();
 }
 
 void PriceFetcher::setAutoRefreshEnabled(bool enabled)
 {
-    if (enabled)
-        m_refreshTimer->start();
-    else
+    m_autoRefresh = enabled;
+    if (!enabled) {
         m_refreshTimer->stop();
+        return;
+    }
+    // Fetch as soon as the app activates, then realign the auto-refresh
+    // to the quarter-hour boundaries from there
+    refresh();
+}
+
+void PriceFetcher::scheduleNextRefresh()
+{
+    // Align the next fetch to just after the next quarter-hour
+    // boundary, when the spot price changes; every refresh re-runs this
+    // so the schedule never drifts behind, and the clamps guarantee a
+    // valid interval even if the clock jumps
+    const QTime t = QDateTime::currentDateTime().time();
+    const int msIntoQuarter = (t.minute() % 15) * 60 * 1000
+            + t.second() * 1000 + t.msec();
+    const int interval = qBound(kMinRefreshMs,
+                                15 * 60 * 1000 - msIntoQuarter + kBoundaryOffsetMs,
+                                kMaxRefreshMs);
+    m_refreshTimer->start(interval);
 }
 
 bool PriceFetcher::loading() const { return m_loading; }
@@ -76,6 +101,11 @@ void PriceFetcher::setResolution(int res)
 
 void PriceFetcher::refresh()
 {
+    // Schedule the next fetch up front so even a failing or timing-out
+    // request leaves the next quarter-boundary attempt in place
+    if (m_autoRefresh)
+        scheduleNextRefresh();
+
     // A refresh supersedes an in-flight request instead of being
     // silently ignored, so a manual "Päivitä" always starts a fetch
     if (m_reply) {
