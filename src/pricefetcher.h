@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
 #ifndef PRICEFETCHER_H
 #define PRICEFETCHER_H
 

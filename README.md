@@ -110,8 +110,10 @@ Store release it is set to `1` and left there.
 
 ## License
 
-PolyForm Noncommercial 1.0.0 — see [LICENSE](LICENSE). The source code
-is open: anyone may read, study, modify, and share it for personal,
-hobby, educational, and other noncommercial purposes. Commercial use,
-including offering the software as a hosted or managed service, is not
-permitted without a separate license from the copyright holder.
+GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later) —
+see [LICENSE](LICENSE). Each source file carries an
+`SPDX-License-Identifier: AGPL-3.0-or-later` tag. Anyone may use,
+study, modify, and redistribute this software, including commercially,
+but any distributed or network-served version must be released in full,
+under the same license, with source code available. Closed-source or
+proprietary derivatives are not permitted.
