@@ -15,7 +15,7 @@ henkilötietoja.
 - Kansi- ja taustapäivitystoiminta rajoittuu hintatietojen
   hakemiseen; mitään tietoa ei lähetetä mihinkään.
 
-Yhteydenotto: jesse@lahtela.email
+Yhteydenotto: GitHub-issuet, https://github.com/Zesseth/Sahkonseuranta/issues
 
 ## English
 
@@ -32,4 +32,4 @@ data.
 - Background activity is limited to fetching price data; no data is
   ever sent anywhere.
 
-Contact: jesse@lahtela.email
+Contact: GitHub issues, https://github.com/Zesseth/Sahkonseuranta/issues

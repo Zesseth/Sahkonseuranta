@@ -47,5 +47,5 @@ What does **not** belong here:
    - category (Utilities), license "AGPL-3.0"
    - privacy policy URL:
      https://github.com/Zesseth/Sahkonseuranta/blob/main/PRIVACY.md
-   - contact email: jesse@lahtela.email
+   - contact details (personal, kept outside this repository)
    - the armv7hl RPM (attached to the matching GitHub Release)
