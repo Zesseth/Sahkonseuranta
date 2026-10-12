@@ -302,30 +302,20 @@ void PriceFetcher::buildBars()
         }
     }
 
-    // The chart window covers the current day onward: entries before the
-    // local midnight of "now" are dropped on every refresh, so the chart
-    // never shows yesterday, but today's earlier hours stay (scrollable)
-    // so the day statistics match what the chart can show. The view
-    // itself is scrolled to the current period in the QML side.
+    // The chart window starts at the current price period: history
+    // before "now" is dropped on every refresh, so the first bar is
+    // always the ongoing one and there is nothing to scroll back to.
+    // The day statistics still cover the full day.
     {
-        int dayStart = -1;
-        for (int i = 0; i < m_allBars.size(); ++i) {
-            QDateTime st = m_allBars.at(i).toMap().value(QStringLiteral("start")).toDateTime();
-            if (st.date() == day) {
-                dayStart = i;
-                break;
-            }
-        }
-        if (dayStart > 0)
-            m_allBars = m_allBars.mid(dayStart);
-
         const int periodMin = (m_resolution == 60) ? 60 : 15;
         for (int i = 0; i < m_allBars.size(); ++i) {
             QVariantMap entry = m_allBars.at(i).toMap();
             QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
             QDateTime end = start.addSecs(periodMin * 60);
             if (start <= now && now < end) {
-                m_allNowIndex = i;
+                if (i > 0)
+                    m_allBars = m_allBars.mid(i);
+                m_allNowIndex = m_allBars.isEmpty() ? -1 : 0;
                 break;
             }
         }

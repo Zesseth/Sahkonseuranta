@@ -3,11 +3,11 @@ import QtQuick 2.6
 import Sailfish.Silica 1.0
 import "Levels.js" as Levels
 
-// Scrollable bar chart covering the current day onward (yesterday is
-// dropped on every refresh; the view starts at the current period).
-// The current bar is highlighted, the configured thresholds are drawn
-// as dashed horizontal lines, the x axis labels whole hours and the
-// left y axis shows the value range in whole cents per kWh.
+// Scrollable bar chart starting at the current price period (history
+// before "now" is dropped on every refresh). The current bar is
+// highlighted, the configured thresholds are drawn as dashed
+// horizontal lines, the x axis labels whole hours and the left y axis
+// shows the value range in whole cents per kWh.
 Item {
     id: graph
 
