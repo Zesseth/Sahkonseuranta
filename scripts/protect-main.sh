@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-or-later
 # Protects the main branch of Zesseth/Sahkonseuranta.
 #
 # Branch protection is only available for PUBLIC repositories on the

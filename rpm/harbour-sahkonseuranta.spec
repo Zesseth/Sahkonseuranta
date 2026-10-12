@@ -12,7 +12,7 @@ Summary:    Electricity spot price tracking
 Version:    0.1.0
 Release:    41
 Group:      Qt/Qt
-License:    PolyForm-Noncommercial-1.0.0
+License:    AGPL-3.0-or-later
 URL:        https://github.com/Zesseth/Sahkonseuranta
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-sahkonseuranta.yaml
@@ -68,5 +68,6 @@ desktop-file-install --delete-original       \
 %{_datadir}/%{name}
 %{_datadir}/applications/%{name}.desktop
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
+%license LICENSE
 # >> files
 # << files

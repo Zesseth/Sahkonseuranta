@@ -62,7 +62,8 @@ the test prints `TIMEOUT` — run it again later.
   `Builder`/`PkgConfigBR`/`Requires` setup, X-Nemo-Application-Type,
   172x172 icon, spec %changelog). Remaining rpmlint warnings:
   unstripped binary (keeps symbols for device debugging) and unknown
-  license tag (PolyForm Noncommercial is not in rpmlint's list).
+  unstripped binary (keeps symbols for device debugging). The license
+  tag AGPL-3.0-or-later is a standard SPDX identifier.
 - **2026-10-11** Debian 13 (trixie), Qt 5.15.15, GCC 14:
   PriceFetcher `11 checks, 0 failures`; Settings `13 checks, 0 failures`
 - **2026-10-11** Static checks on the same host: all QML files pass

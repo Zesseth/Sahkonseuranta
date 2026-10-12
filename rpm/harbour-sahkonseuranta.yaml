@@ -3,7 +3,7 @@ Summary: Electricity spot price tracking
 Version: 0.1.0
 Release: 41
 Group: Qt/Qt
-License: PolyForm-Noncommercial-1.0.0
+License: AGPL-3.0-or-later
 SCM: https://github.com/Zesseth/Sahkonseuranta
 URL: https://github.com/Zesseth/Sahkonseuranta
 Sources:
@@ -24,6 +24,7 @@ PkgConfigBR:
 Requires:
   - sailfishsilica-qt5 >= 0.10.9
 Files:
+  - '%license LICENSE'
   - '%{_bindir}/%{name}'
   - '%{_datadir}/%{name}'
   - '%{_datadir}/applications/%{name}.desktop'
