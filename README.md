@@ -11,7 +11,7 @@ English.
 ## Features
 
 - Current price shown next to a **ball** whose color tells the price
-  level: green = cheap (Halpa), yellow = normal (Normaali),
+  level: green = cheap (Halpa), yellow = middle (Keskitaso),
   red = expensive (Kallis)
 - The current **level is named in text** and a **forecast** tells when
   the level changes and into which level
@@ -30,7 +30,8 @@ English.
 - Stats row: average / min / max over the chart window (the same
   prices the graph shows)
 - Cover page showing the current price
-- Automatic refresh every 30 minutes
+- Automatic refresh aligned to the quarter-hour price boundaries,
+  immediate fetch when the app activates; paused in the background
 - Prices fetched from the open
   [porssisahko.net](https://porssisahko.net/api) v2 API (no key
   required, 192 quarter-hourly prices per fetch)
