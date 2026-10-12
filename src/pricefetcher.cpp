@@ -26,28 +26,30 @@ QString weekdayAbbr(const QDate &d)
     return QString::fromLatin1(names[d.dayOfWeek() - 1]);
 }
 
-// Display text for a moment in the chart window. A plain "klo HH:mm"
-// is used when the moment is the nearest future occurrence of that
-// clock time; when a reader could place it on the wrong day, the
-// weekday abbreviation follows the time ("klo 13:00 Ti",
-// "klo 00:45 Ke").
-QString formatMomentText(const QDateTime &t)
+// "HH:mm", with the weekday abbreviation appended when the moment is
+// not the nearest future occurrence of that clock time
+QString timeText(const QDateTime &t)
 {
-    if (!t.isValid())
-        return QString();
-    QString s = QStringLiteral("klo ") + t.toString(QStringLiteral("HH:mm"));
+    QString s = t.toString(QStringLiteral("HH:mm"));
     const QDate today = QDate::currentDate();
     const QDate d = t.date();
     if (d == today)
         return s;
-    if (d == today.addDays(1)) {
-        // Today's occurrence of the same clock time has already passed,
-        // so the plain time unambiguously means the coming one
-        if (t.time() < QTime::currentTime())
-            return s;
-        return s + QStringLiteral(" ") + weekdayAbbr(d);
-    }
+    // Today's occurrence of the same clock time has already passed, so
+    // the plain time unambiguously means the coming one
+    if (d == today.addDays(1) && t.time() < QTime::currentTime())
+        return s;
     return s + QStringLiteral(" ") + weekdayAbbr(d);
+}
+
+// Display text for a moment in the chart window: "klo HH:mm", with the
+// weekday abbreviation following the time when a reader could place
+// the moment on the wrong day ("klo 13:00 Ti", "klo 00:45 Ke")
+QString formatMomentText(const QDateTime &t)
+{
+    if (!t.isValid())
+        return QString();
+    return QStringLiteral("klo ") + timeText(t);
 }
 // Safety clamps so a clock jump can never leave the refresh timer
 // without a valid interval (and thus without ever fetching)
@@ -121,7 +123,8 @@ QString PriceFetcher::windowSpanText() const
     const QDateTime lastStart = m_allBars.last().toMap().value(QStringLiteral("start")).toDateTime();
     const int periodMin = (m_resolution == 60) ? 60 : 15;
     const QDateTime lastEnd = lastStart.addSecs(periodMin * 60);
-    return formatMomentText(first) + QStringLiteral("\u2013") + formatMomentText(lastEnd);
+    return QStringLiteral("klo ") + timeText(first)
+            + QStringLiteral(" \u2013 ") + timeText(lastEnd);
 }
 int PriceFetcher::resolution() const { return m_resolution; }
 int PriceFetcher::nowIndex() const { return m_nowIndex; }
