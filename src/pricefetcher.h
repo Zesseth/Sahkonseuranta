@@ -32,6 +32,12 @@ class PriceFetcher : public QObject
     Q_PROPERTY(double avgPrice READ avgPrice NOTIFY statsChanged)
     Q_PROPERTY(double minPrice READ minPrice NOTIFY statsChanged)
     Q_PROPERTY(double maxPrice READ maxPrice NOTIFY statsChanged)
+    // When the window minimum and maximum occur, and the time span the
+    // average covers, formatted for display ("HH:mm", with the weekday
+    // abbreviation appended when the moment is not today)
+    Q_PROPERTY(QString minTimeText READ minTimeText NOTIFY statsChanged)
+    Q_PROPERTY(QString maxTimeText READ maxTimeText NOTIFY statsChanged)
+    Q_PROPERTY(QString windowSpanText READ windowSpanText NOTIFY statsChanged)
     Q_PROPERTY(int resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
     Q_PROPERTY(int nowIndex READ nowIndex NOTIFY barsChanged)
     // How long the current price level holds and what it changes into.
@@ -57,6 +63,9 @@ public:
     double avgPrice() const;
     double minPrice() const;
     double maxPrice() const;
+    QString minTimeText() const;
+    QString maxTimeText() const;
+    QString windowSpanText() const;
     int resolution() const;
     void setResolution(int res);
     int nowIndex() const;
@@ -113,6 +122,8 @@ private:
     double m_avg = 0.0;
     double m_min = 0.0;
     double m_max = 0.0;
+    QDateTime m_minTime;
+    QDateTime m_maxTime;
     int m_resolution = 15;
     int m_nowIndex = -1;
     QDateTime m_nowUntil;

@@ -104,6 +104,10 @@ int main(int argc, char *argv[])
                   "avg matches the chart window");
             check(qAbs(f.minPrice() - mn) < 0.005, "min matches the chart window");
             check(qAbs(f.maxPrice() - mx) < 0.005, "max matches the chart window");
+            // The min/max carry their moment, the average its time span
+            check(!f.minTimeText().isEmpty(), "min time text set");
+            check(!f.maxTimeText().isEmpty(), "max time text set");
+            check(!f.windowSpanText().isEmpty(), "window span text set");
         }
         if (f.hasNextPrice()) {
             check(f.nextPriceStart().isValid() && f.nextPriceStart() >= f.nowUntil(),

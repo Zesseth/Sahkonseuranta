@@ -225,11 +225,28 @@ Page {
                                 color: Theme.secondaryHighlightColor
                                 font.pixelSize: Theme.fontSizeSmall
                             }
+                            Row {
+                                spacing: Theme.paddingSmall
+
+                                Label {
+                                    id: minValue
+                                    text: page.fmtPrice(priceFetcher.minPrice)
+                                    color: Theme.highlightColor
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    font.bold: true
+                                }
+                                Label {
+                                    anchors.baseline: minValue.baseline
+                                    text: qsTr("snt/kWh")
+                                    color: Theme.secondaryColor
+                                    font.pixelSize: Theme.fontSizeExtraSmall
+                                }
+                            }
                             Label {
-                                text: page.fmtPrice(priceFetcher.minPrice)
-                                color: Theme.highlightColor
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.bold: true
+                                text: qsTr("klo %1").arg(priceFetcher.minTimeText)
+                                color: Theme.secondaryColor
+                                font.pixelSize: Theme.fontSizeTiny
+                                visible: priceFetcher.minTimeText !== ""
                             }
                         }
 
@@ -242,11 +259,28 @@ Page {
                                 color: Theme.secondaryHighlightColor
                                 font.pixelSize: Theme.fontSizeSmall
                             }
+                            Row {
+                                spacing: Theme.paddingSmall
+
+                                Label {
+                                    id: avgValue
+                                    text: page.fmtPrice(priceFetcher.avgPrice)
+                                    color: Theme.highlightColor
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    font.bold: true
+                                }
+                                Label {
+                                    anchors.baseline: avgValue.baseline
+                                    text: qsTr("snt/kWh")
+                                    color: Theme.secondaryColor
+                                    font.pixelSize: Theme.fontSizeExtraSmall
+                                }
+                            }
                             Label {
-                                text: page.fmtPrice(priceFetcher.avgPrice)
-                                color: Theme.highlightColor
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.bold: true
+                                text: qsTr("klo %1").arg(priceFetcher.windowSpanText)
+                                color: Theme.secondaryColor
+                                font.pixelSize: Theme.fontSizeTiny
+                                visible: priceFetcher.windowSpanText !== ""
                             }
                         }
 
@@ -259,11 +293,28 @@ Page {
                                 color: Theme.secondaryHighlightColor
                                 font.pixelSize: Theme.fontSizeSmall
                             }
+                            Row {
+                                spacing: Theme.paddingSmall
+
+                                Label {
+                                    id: maxValue
+                                    text: page.fmtPrice(priceFetcher.maxPrice)
+                                    color: Theme.highlightColor
+                                    font.pixelSize: Theme.fontSizeLarge
+                                    font.bold: true
+                                }
+                                Label {
+                                    anchors.baseline: maxValue.baseline
+                                    text: qsTr("snt/kWh")
+                                    color: Theme.secondaryColor
+                                    font.pixelSize: Theme.fontSizeExtraSmall
+                                }
+                            }
                             Label {
-                                text: page.fmtPrice(priceFetcher.maxPrice)
-                                color: Theme.highlightColor
-                                font.pixelSize: Theme.fontSizeLarge
-                                font.bold: true
+                                text: qsTr("klo %1").arg(priceFetcher.maxTimeText)
+                                color: Theme.secondaryColor
+                                font.pixelSize: Theme.fontSizeTiny
+                                visible: priceFetcher.maxTimeText !== ""
                             }
                         }
                     }

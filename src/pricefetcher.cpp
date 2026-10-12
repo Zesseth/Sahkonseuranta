@@ -19,6 +19,24 @@ const int kRequestTimeoutMs = 20 * 1000;
 // The spot price changes at each quarter-hour boundary; fetch a few
 // seconds after it so the app always has the new period's price
 const int kBoundaryOffsetMs = 5 * 1000;
+
+QString weekdayAbbr(const QDate &d)
+{
+    static const char *const names[] = { "Su", "Ma", "Ti", "Ke", "To", "Pe", "La" };
+    return QString::fromLatin1(names[d.dayOfWeek() - 1]);
+}
+
+// "HH:mm", with the weekday abbreviation appended when the moment is
+// not today (same convention as the chart's midnight axis labels)
+QString formatMomentText(const QDateTime &t)
+{
+    if (!t.isValid())
+        return QString();
+    QString s = t.toString(QStringLiteral("HH:mm"));
+    if (t.date() != QDate::currentDate())
+        s += QStringLiteral(" ") + weekdayAbbr(t.date());
+    return s;
+}
 // Safety clamps so a clock jump can never leave the refresh timer
 // without a valid interval (and thus without ever fetching)
 const int kMinRefreshMs = 10 * 1000;
@@ -81,6 +99,22 @@ double PriceFetcher::displayPrice() const
 double PriceFetcher::avgPrice() const { return m_avg; }
 double PriceFetcher::minPrice() const { return m_min; }
 double PriceFetcher::maxPrice() const { return m_max; }
+QString PriceFetcher::minTimeText() const { return formatMomentText(m_minTime); }
+QString PriceFetcher::maxTimeText() const { return formatMomentText(m_maxTime); }
+QString PriceFetcher::windowSpanText() const
+{
+    if (m_allBars.isEmpty())
+        return QString();
+    const QDateTime first = m_allBars.first().toMap().value(QStringLiteral("start")).toDateTime();
+    const QDateTime lastStart = m_allBars.last().toMap().value(QStringLiteral("start")).toDateTime();
+    const int periodMin = (m_resolution == 60) ? 60 : 15;
+    const QDateTime lastEnd = lastStart.addSecs(periodMin * 60);
+    QString s = first.toString(QStringLiteral("HH:mm"))
+            + QStringLiteral("\u2013") + lastEnd.toString(QStringLiteral("HH:mm"));
+    if (lastEnd.date() != QDate::currentDate())
+        s += QStringLiteral(" ") + weekdayAbbr(lastEnd.date());
+    return s;
+}
 int PriceFetcher::resolution() const { return m_resolution; }
 int PriceFetcher::nowIndex() const { return m_nowIndex; }
 QDateTime PriceFetcher::nowUntil() const { return m_nowUntil; }
@@ -310,9 +344,16 @@ void PriceFetcher::buildBars()
         double sum = 0.0;
         int n = 0;
         for (int i = 0; i < m_allBars.size(); ++i) {
-            const double p = m_allBars.at(i).toMap().value(QStringLiteral("price")).toDouble();
-            if (n == 0 || p < m_min) m_min = p;
-            if (n == 0 || p > m_max) m_max = p;
+            const QVariantMap entry = m_allBars.at(i).toMap();
+            const double p = entry.value(QStringLiteral("price")).toDouble();
+            if (n == 0 || p < m_min) {
+                m_min = p;
+                m_minTime = entry.value(QStringLiteral("start")).toDateTime();
+            }
+            if (n == 0 || p > m_max) {
+                m_max = p;
+                m_maxTime = entry.value(QStringLiteral("start")).toDateTime();
+            }
             sum += p;
             n++;
         }
@@ -322,6 +363,8 @@ void PriceFetcher::buildBars()
             m_avg = 0.0;
             m_min = 0.0;
             m_max = 0.0;
+            m_minTime = QDateTime();
+            m_maxTime = QDateTime();
         }
     }
 
