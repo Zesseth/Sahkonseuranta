@@ -108,6 +108,11 @@ int main(int argc, char *argv[])
             check(!f.minTimeText().isEmpty(), "min time text set");
             check(!f.maxTimeText().isEmpty(), "max time text set");
             check(!f.windowSpanText().isEmpty(), "window span text set");
+            // The rolling 48 h API window is trimmed so the data never
+            // crosses past the end of tomorrow
+            QDateTime lastStart = all.at(all.size() - 1).toMap().value("start").toDateTime();
+            check(lastStart < QDateTime(QDate::currentDate().addDays(2), QTime(0, 0)),
+                  "chart ends within tomorrow");
         }
         if (f.hasNextPrice()) {
             check(f.nextPriceStart().isValid() && f.nextPriceStart() >= f.nowUntil(),

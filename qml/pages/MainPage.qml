@@ -243,7 +243,7 @@ Page {
                                 }
                             }
                             Label {
-                                text: qsTr("klo %1").arg(priceFetcher.minTimeText)
+                                text: priceFetcher.minTimeText
                                 color: Theme.secondaryColor
                                 font.pixelSize: Theme.fontSizeTiny
                                 visible: priceFetcher.minTimeText !== ""
@@ -277,7 +277,7 @@ Page {
                                 }
                             }
                             Label {
-                                text: qsTr("klo %1").arg(priceFetcher.windowSpanText)
+                                text: priceFetcher.windowSpanText
                                 color: Theme.secondaryColor
                                 font.pixelSize: Theme.fontSizeTiny
                                 visible: priceFetcher.windowSpanText !== ""
@@ -311,7 +311,7 @@ Page {
                                 }
                             }
                             Label {
-                                text: qsTr("klo %1").arg(priceFetcher.maxTimeText)
+                                text: priceFetcher.maxTimeText
                                 color: Theme.secondaryColor
                                 font.pixelSize: Theme.fontSizeTiny
                                 visible: priceFetcher.maxTimeText !== ""
