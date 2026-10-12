@@ -8,9 +8,20 @@ Contents:
 
 - `description-fi.md` - the Finnish store description (paste into the
   Harbour submission form)
-- `screenshots/` - store screenshots, captured from the emulator with
-  VirtualBox (`VBoxManage controlvm <vm> screenshotpng <file.png>`)
-  or on a real device with the system screenshot gesture
+- `screenshots/` - store screenshots at the emulator's native
+  resolution (720x1600). Capture over SSH with the lipstick screenshot
+  API (needs root on the session bus; VirtualBox's own capture is
+  only half resolution - do not use it for the store):
+
+  ```
+  ssh -p 2223 root@<emulator-ip> \
+    "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/100000/dbus/user_bus_socket \
+     dbus-send --session --print-reply --dest=com.jolla.lipstick \
+     /org/nemomobile/lipstick/screenshot \
+     org.nemomobile.lipstick.saveScreenshot string:/home/defaultuser/Pictures/shot.png"
+  ```
+
+  On a real device, use the system screenshot gesture instead
 
 What does **not** belong here:
 
