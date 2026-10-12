@@ -127,13 +127,19 @@ Page {
                         id: resolutionCombo
                         width: parent.width
                         label: qsTr("Palkkien hinnoittelu")
+                        // Reactive: reflects external changes to the setting
                         currentIndex: appSettings.resolution === 60 ? 1 : 0
+                        // Writes only after construction, so index changes
+                        // during page build do not trigger redundant writes
+                        property bool ready: false
+                        Component.onCompleted: ready = true
                         menu: ContextMenu {
                             MenuItem { text: qsTr("15 min") }
                             MenuItem { text: qsTr("1 tunti") }
                         }
                         onCurrentIndexChanged: {
-                            appSettings.resolution = currentIndex === 1 ? 60 : 15
+                            if (ready)
+                                appSettings.resolution = currentIndex === 1 ? 60 : 15
                         }
                     }
                 }

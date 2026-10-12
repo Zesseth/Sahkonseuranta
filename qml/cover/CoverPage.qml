@@ -36,9 +36,9 @@ CoverBackground {
 
         Label {
             width: parent.width
-            text: priceFetcher.avgPrice > 0
-                  ? qsTr("Keskihinta %1").arg(priceFetcher.avgPrice.toFixed(2))
-                  : ""
+            visible: priceFetcher.hasData
+            text: qsTr("Keskihinta %1")
+                  .arg(priceFetcher.avgPrice.toFixed(2).replace(".", ","))
             color: Theme.secondaryColor
             font.pixelSize: Theme.fontSizeExtraSmall
         }

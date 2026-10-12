@@ -9,8 +9,8 @@ Name:       harbour-sahkonseuranta
 # << macros
 
 Summary:    Electricity spot price tracking
-Version:    0.1.0
-Release:    42
+Version:    1.0.0
+Release:    1
 Group:      Qt/Qt
 License:    AGPL-3.0-or-later
 URL:        https://github.com/Zesseth/Sahkonseuranta

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import QtQuick 2.6
 import Sailfish.Silica 1.0
+import "Levels.js" as Levels
 
 // Scrollable bar chart of everything the API returned (today +
 // tomorrow). The current bar is highlighted, the configured
@@ -92,23 +93,11 @@ Item {
     }
 
     function barColor(price) {
-        if (price <= cheapThreshold)
-            return "#2ecc71"
-        if (price >= expensiveThreshold)
-            return "#e74c3c"
-        return "#f1c40f"
+        return Levels.colorOf(price, cheapThreshold, expensiveThreshold)
     }
 
     function barX(index) {
         return index * barWidth
-    }
-
-    // Center the view on a bar index, clamped to the content bounds
-    function scrollToIndex(index) {
-        if (index < 0 || bars.length === 0)
-            return
-        var x = barX(index) + barWidth / 2 - scroll.width / 2
-        scroll.contentX = Math.max(0, Math.min(x, scroll.contentWidth - scroll.width))
     }
 
     // Show the current bar as the first bar of the view so the user
@@ -137,16 +126,6 @@ Item {
             var x = graph.pendingNowIndex * bw
             var maxX = graph.bars.length * bw - scroll.width
             scroll.contentX = Math.max(0, Math.min(x, Math.max(0, maxX)))
-        }
-    }
-
-    // Scroll to the first bar at or after the given time
-    function scrollToDate(when) {
-        for (var i = 0; i < bars.length; ++i) {
-            if (bars[i].start >= when) {
-                scrollToIndex(i)
-                return
-            }
         }
     }
 

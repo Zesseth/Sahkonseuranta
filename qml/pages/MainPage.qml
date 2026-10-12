@@ -2,6 +2,7 @@
 import QtQuick 2.6
 import Sailfish.Silica 1.0
 import "../components"
+import "../components/Levels.js" as Levels
 
 Page {
     id: page
@@ -18,11 +19,7 @@ Page {
 
     // Price levels follow the thresholds configured in Settings
     function levelOf(price) {
-        if (price <= appSettings.cheapThreshold)
-            return 0
-        if (price >= appSettings.expensiveThreshold)
-            return 2
-        return 1
+        return Levels.levelOf(price, appSettings.cheapThreshold, appSettings.expensiveThreshold)
     }
 
     function levelName(level) {
@@ -42,11 +39,7 @@ Page {
     }
 
     function levelColor(level) {
-        if (level === 0)
-            return "#2ecc71"
-        if (level === 2)
-            return "#e74c3c"
-        return "#f1c40f"
+        return Levels.levelColor(level)
     }
 
     // Next bar whose level differs from the current one - the price may

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(harbour-sahkonseuranta
-    VERSION 0.1.0
+    VERSION 1.0.0
     DESCRIPTION "Finnish electricity spot price tracker"
     LANGUAGES CXX)
 
@@ -35,8 +35,6 @@ target_link_libraries(harbour-sahkonseuranta
 
 install(TARGETS harbour-sahkonseuranta DESTINATION bin)
 install(DIRECTORY qml DESTINATION share/harbour-sahkonseuranta)
-install(DIRECTORY translations DESTINATION share/harbour-sahkonseuranta
-    FILES_MATCHING PATTERN "*.qm")
 install(FILES harbour-sahkonseuranta.desktop DESTINATION share/applications)
 install(FILES icons/86x86/harbour-sahkonseuranta.png
     DESTINATION share/icons/hicolor/86x86/apps)

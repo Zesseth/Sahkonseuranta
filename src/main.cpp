@@ -37,6 +37,13 @@ int main(int argc, char *argv[])
         fetcher.setResolution(settings.resolution());
     });
 
+    // Pause the auto-refresh while the app is in the background so a
+    // suspended device is not woken up just to fetch prices
+    QObject::connect(app.data(), &QGuiApplication::applicationStateChanged, &fetcher,
+                     [&fetcher](Qt::ApplicationState state) {
+        fetcher.setAutoRefreshEnabled(state == Qt::ApplicationActive);
+    });
+
     view->rootContext()->setContextProperty(QStringLiteral("priceFetcher"), &fetcher);
     view->rootContext()->setContextProperty(QStringLiteral("appSettings"), &settings);
     view->rootContext()->setContextProperty(QStringLiteral("appVersion"), QStringLiteral(APP_VERSION));

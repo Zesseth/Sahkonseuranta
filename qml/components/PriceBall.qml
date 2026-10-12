@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import QtQuick 2.6
 import Sailfish.Silica 1.0
+import "Levels.js" as Levels
 
 // Ball whose color tells the price level plus the plain price next to
 // it. The color follows the user-configured thresholds:
@@ -10,23 +11,18 @@ import Sailfish.Silica 1.0
 Row {
     id: ball
 
+    // Defaults match the Settings defaults (5.0 / 10.0 cents)
     property double price: 0.0
-    property double cheapThreshold: 2.0
+    property double cheapThreshold: 5.0
     property double expensiveThreshold: 10.0
     property bool hasData: false
     property int priceFontSize: Theme.fontSizeHuge
 
-    readonly property string greenColor: "#2ecc71"
-    readonly property string yellowColor: "#f1c40f"
-    readonly property string redColor: "#e74c3c"
-
-    readonly property bool isCheap: hasData && price <= cheapThreshold
-    readonly property bool isExpensive: hasData && price >= expensiveThreshold
+    readonly property int level: !hasData ? 1
+                                 : Levels.levelOf(price, cheapThreshold, expensiveThreshold)
 
     readonly property string stateColor: !hasData ? Theme.secondaryColor
-                                   : isCheap ? greenColor
-                                   : isExpensive ? redColor
-                                   : yellowColor
+                                   : Levels.levelColor(level)
 
     spacing: Theme.paddingLarge
 

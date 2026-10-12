@@ -14,16 +14,27 @@
 namespace {
 const char *kLatestPricesUrl = "https://api.porssisahko.net/v2/latest-prices.json";
 const int kAutoRefreshMs = 30 * 60 * 1000;
+// Abort a request that has not finished within this time so a hung
+// connection cannot leave the app stuck in the loading state
+const int kRequestTimeoutMs = 20 * 1000;
 }
 
 PriceFetcher::PriceFetcher(QObject *parent)
     : QObject(parent)
     , m_nam(new QNetworkAccessManager(this))
 {
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(kAutoRefreshMs);
-    connect(timer, &QTimer::timeout, this, &PriceFetcher::refresh);
-    timer->start();
+    m_refreshTimer = new QTimer(this);
+    m_refreshTimer->setInterval(kAutoRefreshMs);
+    connect(m_refreshTimer, &QTimer::timeout, this, &PriceFetcher::refresh);
+    m_refreshTimer->start();
+}
+
+void PriceFetcher::setAutoRefreshEnabled(bool enabled)
+{
+    if (enabled)
+        m_refreshTimer->start();
+    else
+        m_refreshTimer->stop();
 }
 
 bool PriceFetcher::loading() const { return m_loading; }
@@ -65,16 +76,31 @@ void PriceFetcher::setResolution(int res)
 
 void PriceFetcher::refresh()
 {
-    if (m_loading)
-        return;
+    // A refresh supersedes an in-flight request instead of being
+    // silently ignored, so a manual "Päivitä" always starts a fetch
+    if (m_reply) {
+        disconnect(m_reply, nullptr, this, nullptr);
+        m_reply->abort();
+        m_reply->deleteLater();
+        m_reply = nullptr;
+        setLoading(false);
+    }
+
     setLoading(true);
-    emit loadingChanged();
 
     QNetworkRequest req(QUrl(QString::fromLatin1(kLatestPricesUrl)));
     req.setHeader(QNetworkRequest::UserAgentHeader,
-                 QStringLiteral("harbour-sahkonseuranta/0.1"));
+                 QStringLiteral("harbour-sahkonseuranta/1.0"));
     m_reply = m_nam->get(req);
     connect(m_reply, &QNetworkReply::finished, this, &PriceFetcher::onFinished);
+
+    // Time the request out on a stalled connection; abort() triggers
+    // the connected finished() handler, which runs the normal error path
+    QNetworkReply *reply = m_reply;
+    QTimer::singleShot(kRequestTimeoutMs, this, [this, reply]() {
+        if (m_reply == reply)
+            reply->abort();
+    });
 }
 
 void PriceFetcher::onFinished()
@@ -89,7 +115,6 @@ void PriceFetcher::onFinished()
     if (reply->error() != QNetworkReply::NoError) {
         setErrorString(QStringLiteral("Verkkovirhe"));
         setLoading(false);
-        emit loadingChanged();
         return;
     }
     QByteArray data = reply->readAll();
@@ -97,7 +122,6 @@ void PriceFetcher::onFinished()
     if (!doc.isObject()) {
         setErrorString(QStringLiteral("Virheellinen vastaus"));
         setLoading(false);
-        emit loadingChanged();
         return;
     }
     QJsonArray arr = doc.object().value(QStringLiteral("prices")).toArray();
@@ -124,50 +148,42 @@ void PriceFetcher::onFinished()
     buildBars();
 
     emit pricesChanged();
-    emit loadingChanged();
-    emit errorStringChanged();
 }
 
 namespace {
-// Aggregate quarter-hour entries into hourly average bars.
+// Aggregate quarter-hour entries into hourly average bars. The input
+// is in ascending time order, so consecutive entries sharing the same
+// calendar hour are grouped in a single O(n) pass.
 QVariantList aggregateHourly(const QVariantList &in)
 {
-    QVariantList hourly;
+    QVariantList out;
+    QDateTime hourStart;
+    double sum = 0.0;
+    int count = 0;
     for (int i = 0; i < in.size(); ++i) {
-        QVariantMap entry = in.at(i).toMap();
-        QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
-        int found = -1;
-        for (int h = 0; h < hourly.size(); ++h) {
-            QVariantMap m = hourly.at(h).toMap();
-            QDateTime hs = m.value(QStringLiteral("start")).toDateTime();
-            if (hs.date() == start.date() && hs.time().hour() == start.time().hour()) {
-                found = h;
-                break;
-            }
-        }
-        if (found >= 0) {
-            QVariantMap m = hourly.at(found).toMap();
-            m.insert(QStringLiteral("priceSum"),
-                     m.value(QStringLiteral("priceSum")).toDouble()
-                     + entry.value(QStringLiteral("price")).toDouble());
-            m.insert(QStringLiteral("count"), m.value(QStringLiteral("count")).toInt() + 1);
-            hourly.replace(found, m);
+        const QVariantMap entry = in.at(i).toMap();
+        const QDateTime start = entry.value(QStringLiteral("start")).toDateTime();
+        const double price = entry.value(QStringLiteral("price")).toDouble();
+        if (count > 0 && hourStart.date() == start.date()
+                && hourStart.time().hour() == start.time().hour()) {
+            sum += price;
+            count++;
         } else {
-            QVariantMap m;
-            m.insert(QStringLiteral("start"), start);
-            m.insert(QStringLiteral("priceSum"), entry.value(QStringLiteral("price")).toDouble());
-            m.insert(QStringLiteral("count"), 1);
-            hourly.append(m);
+            if (count > 0) {
+                QVariantMap bar;
+                bar.insert(QStringLiteral("start"), hourStart);
+                bar.insert(QStringLiteral("price"), sum / count);
+                out.append(bar);
+            }
+            hourStart = start;
+            sum = price;
+            count = 1;
         }
     }
-    QVariantList out;
-    for (int i = 0; i < hourly.size(); ++i) {
-        QVariantMap m = hourly.at(i).toMap();
+    if (count > 0) {
         QVariantMap bar;
-        bar.insert(QStringLiteral("start"), m.value(QStringLiteral("start")));
-        bar.insert(QStringLiteral("price"),
-                   m.value(QStringLiteral("priceSum")).toDouble()
-                   / m.value(QStringLiteral("count")).toDouble());
+        bar.insert(QStringLiteral("start"), hourStart);
+        bar.insert(QStringLiteral("price"), sum / count);
         out.append(bar);
     }
     return out;
@@ -186,7 +202,10 @@ void PriceFetcher::buildBars()
 
     if (m_prices.isEmpty()) {
         emit barsChanged();
+        emit allBarsChanged();
+        emit statsChanged();
         emit currentPriceChanged();
+        emit nowPeriodChanged();
         return;
     }
 
@@ -295,15 +314,24 @@ void PriceFetcher::buildBars()
 
     m_bars = dayPrices;
     emit barsChanged();
+    emit allBarsChanged();
+    emit statsChanged();
     emit currentPriceChanged();
+    emit nowPeriodChanged();
 }
 
 void PriceFetcher::setLoading(bool loading)
 {
+    if (m_loading == loading)
+        return;
     m_loading = loading;
+    emit loadingChanged();
 }
 
 void PriceFetcher::setErrorString(const QString &err)
 {
+    if (m_error == err)
+        return;
     m_error = err;
+    emit errorStringChanged();
 }
