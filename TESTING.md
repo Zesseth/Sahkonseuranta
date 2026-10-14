@@ -185,6 +185,24 @@ pkcon install-local harbour-sahkonseuranta-widget-1.0.0-1.noarch.rpm
 
 ## Test history
 
+- **2026-10-14** Second Events View widget review round (branch
+  vibe/events-view-widget-2828ea, host build, SDK 3.13.5):
+  - Unit tests re-run against the live API: PriceFetcher
+    26 checks, 0 failures; Settings 17 checks, 0 failures.
+  - Security/efficiency review of the widget found one defect,
+    now fixed: a non-numeric `price` value in the API response is
+    skipped like an invalid date, so `NaN` can never reach the
+    Lipstick UI (the app's C++ side already degraded it to 0.0).
+  - After the fix: `sfdk build` OK and `sfdk check` reports
+    **Validation succeeded** (0 errors); the Store RPM ships the
+    fixed `qml/eventsview/PriceWidget.qml` (sha256-verified).
+  - Companion RPM: rpmlint 0 errors (known AGPL tag warning only);
+    `sfdk check` on the companion fails on the
+    `/usr/share/lipstick/` path, confirming the Store/companion
+    split is required.
+  - `qmllint` was not runnable on this host (the host wrapper
+    points to a missing binary); the QML change is covered by the
+    rebuild above.
 - **2026-10-14** Events View widget review round (branch
   vibe/events-view-widget-2828ea, WSL2 Debian, SDK 3.13.5):
   - Unit tests re-run against the live API: PriceFetcher

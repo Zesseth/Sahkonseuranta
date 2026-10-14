@@ -229,9 +229,14 @@ Item {
                     for (var i = 0; i < arr.length; ++i) {
                         var start = new Date(arr[i].startDate)
                         var end = new Date(arr[i].endDate)
+                        var price = arr[i].price
                         if (isNaN(start.getTime()) || isNaN(end.getTime()) || end <= start)
                             continue
-                        parsed.push({ price: arr[i].price, start: start, end: end })
+                        // A malformed price would propagate NaN into the
+                        // Lipstick UI; skip it like an invalid date
+                        if (typeof price !== "number" || !isFinite(price))
+                            continue
+                        parsed.push({ price: price, start: start, end: end })
                     }
                 } catch (e) {
                     parsed = []
