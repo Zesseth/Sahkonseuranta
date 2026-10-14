@@ -18,7 +18,8 @@ Sources:
   - '%{name}-%{version}.tar.bz2'
 Configure: none
 Builder: none
+Architectures: noarch
 Requires:
-  - harbour-sahkonseuranta
+  - harbour-sahkonseuranta >= 1.0.0
 Files:
   - '%{_datadir}/lipstick/eventswidgets/harbour-sahkonseuranta.json'

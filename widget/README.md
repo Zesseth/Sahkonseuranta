@@ -19,9 +19,22 @@ process**. Because of that the widget is fully self-contained:
   QSettings file the app writes (`~/.config/fi.zesseth/sahkonseuranta.conf`),
 - it shares the price-level logic (`Levels.js`) and the ball component
   (`PriceBall.qml`) with the app through a relative QML import,
-- it only does work while `visible` (active on the Events View): the
-  fetch is re-aligned to just after each quarter-hour boundary, and all
-  timers and in-flight requests are stopped when the widget is hidden.
+- it only does work while it is actually on screen: the Events View
+  keeps enabled widgets instantiated and `visible` the whole time, so
+  the widget additionally requires the loader-provided
+  `eventsViewVisible` context property to hold. The fetch is
+  re-aligned to just after each quarter-hour boundary, and all timers
+  and in-flight requests are stopped when the Events View is left.
+
+## Requirements
+
+- **Sailfish OS 5.x or later.** Third-party Events View widgets are
+  loaded by `EventsWidgetsModel` in lipstick-jolla-home 5.0 and
+  later. Sailfish OS 4.6 has no such loader: there the companion
+  RPM installs, but nothing ever loads the widget. The main app is
+  of course unaffected on every release.
+- The main app (`harbour-sahkonseuranta` >= 1.0.0) must be installed;
+  the companion RPM declares this dependency.
 
 ## Layout
 
@@ -29,9 +42,12 @@ process**. Because of that the widget is fully self-contained:
   itself. Installed by the main RPM under
   `/usr/share/harbour-sahkonseuranta/qml/eventsview/`, which is an
   allowed location for the Jolla Store.
-- `harbour-sahkonseuranta.json` — the Lipstick registration descriptor.
-- `harbour-sahkonseuranta-widget.yaml` — spectacle spec for the separate
-  companion RPM that installs the JSON under
+- `harbour-sahkonseuranta.json` — the Lipstick registration
+  descriptor (`title`, `icon`, `order`, `path`, `available_path`,
+  `default_enabled`), matching the descriptor format of the built-in
+  weather and calendar widgets.
+- `rpm/harbour-sahkonseuranta-widget.yaml` — spectacle spec for
+  the separate companion RPM that installs the JSON under
   `/usr/share/lipstick/eventswidgets/`.
 
 ## Why two packages
@@ -57,7 +73,17 @@ Install the main app, then install the companion RPM:
     pkcon install-local harbour-sahkonseuranta-widget-1.0.0-1.noarch.rpm
 
 The widget appears in **Settings → Events view** and is enabled by
-default (`default_enabled: true`).
+default (`default_enabled: true`). Uninstalling the main app while
+keeping the companion leaves the widget entry pointing at a missing
+QML file; the `available_path` field lets the settings page detect
+that.
+
+## Building the companion RPM
+
+```bash
+cd widget
+sfdk build          # produces RPMS/.../harbour-sahkonseuranta-widget-1.0.0-1.noarch.rpm
+```
 
 ## Limitations
 

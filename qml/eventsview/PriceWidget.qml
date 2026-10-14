@@ -18,9 +18,16 @@ Item {
     implicitHeight: content.height + 2 * Theme.paddingLarge
     height: implicitHeight
 
-    // Lipstick sets visibility; the widget may only do work while it
-    // is on the Events View
+    // Lipstick's Events View keeps enabled widgets instantiated with a
+    // Loader whose item stays visible the whole time, so visibility
+    // alone cannot tell whether the Events View is on screen. The
+    // loader scope also provides eventsViewVisible; the widget may
+    // only do work while both hold. If that context property is
+    // ever unavailable, degrade to the plain visibility rule
+    // instead of breaking the widget.
     property bool active: visible
+                          && (typeof eventsViewVisible === "undefined"
+                              ? true : eventsViewVisible)
 
     // Price periods in ascending start order: [{price, start, end}]
     property var entries: []
@@ -105,10 +112,6 @@ Item {
         return qsTr("keskitasoon")
     }
 
-    function formatPrice(value) {
-        return value.toFixed(2).replace(".", ",")
-    }
-
     // "HH:mm", with the weekday abbreviation appended when the moment
     // is not today (same rule as the app uses)
     function formatTime(t) {
@@ -171,7 +174,10 @@ Item {
                 return
             var home = "/home/nemo"
             if (environ.readyState === XMLHttpRequest.DONE && environ.responseText.length > 0) {
-                var match = environ.responseText.match(/HOME=(\/[^\x00]*)/)
+                // Entries are NUL-separated; anchor HOME= to
+                // the start of an entry so a variable such
+                // as XDG_CONFIG_HOME=/... is not mistaken for HOME
+                var match = environ.responseText.match(/(?:^|\x00)HOME=(\/[^\x00]*)/)
                 if (match)
                     home = match[1]
             }

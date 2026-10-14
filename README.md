@@ -31,6 +31,12 @@ English. The app collects no user data - see
 - Stats row: average / min / max over the chart window (the same
   prices the graph shows)
 - Cover page showing the current price
+- Optional **Events View widget** (Sailfish OS 5.x): the current
+  price, level ball and level-change forecast on the home screen's
+  Events View. The widget QML ships inside the Store package
+  (inert without registration); the registration file is a separate
+  companion RPM for OpenRepos/Chum - see
+  [widget/README.md](widget/README.md)
 - Automatic refresh aligned to the quarter-hour price boundaries,
   immediate fetch when the app activates; paused in the background
 - Prices fetched from the open
@@ -58,11 +64,14 @@ qml/pages/SettingsPage.qml      — thresholds and chart resolution
 qml/components/PriceBall.qml    — colored ball + plain price
 qml/components/PriceGraph.qml   — bar chart component (threshold colors)
 qml/cover/CoverPage.qml         — cover page
+qml/eventsview/PriceWidget.qml  — Events View widget (Lipstick)
 src/main.cpp                    — startup, context properties
 src/pricefetcher.{h,cpp}        — API fetch, JSON parsing, aggregation
 src/settings.{h,cpp}            — user settings (QSettings persistence)
 icons/                          — launcher icons (86, 108, 128, 256)
 rpm/harbour-sahkonseuranta.yaml — RPM packaging
+widget/                        — Events View registration
+                                 (companion RPM, OpenRepos/Chum)
 ```
 
 ## Building (SailfishOS SDK)

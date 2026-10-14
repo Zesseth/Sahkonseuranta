@@ -12,11 +12,12 @@ Summary:    Events View widget registration for Sähkönseuranta
 Version:    1.0.0
 Release:    1
 Group:      Qt/Qt
+BuildArch:  noarch
 License:    AGPL-3.0-or-later
 URL:        https://github.com/Zesseth/Sahkonseuranta
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-sahkonseuranta-widget.yaml
-Requires:   harbour-sahkonseuranta
+Requires:   harbour-sahkonseuranta >= 1.0.0
 
 %description
 Registers the Sähkönseuranta Events View widget with Lipstick.
