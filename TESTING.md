@@ -154,37 +154,85 @@ The Events View widget is loaded by lipstick-jolla-home 5.x
 (`EventsWidgetsModel`); Sailfish OS 4.6 has no third-party widget
 loader at all, so the 4.6 emulator can only verify that the
 companion RPM installs cleanly - functional widget testing needs a
-SFOS 5.x device (Jolla Phone 2026).
+SFOS 5.x emulator or a SFOS 5.x device (Jolla Phone 2026).
 
 Build and install:
 
 ```bash
 cd widget && sfdk build   # noarch RPM
-pkcon install-local harbour-sahkonseuranta-widget-1.0.0-1.noarch.rpm
+rpm -U harbour-sahkonseuranta-1.0.0-11.i486.rpm \
+       harbour-sahkonseuranta-widget-1.0.0-1.noarch.rpm
 ```
 
-- [ ] Descriptor is valid JSON and installs to
+- [x] Descriptor is valid JSON and installs to
       `/usr/share/lipstick/eventswidgets/harbour-sahkonseuranta.json`
-- [ ] The Store RPM (main app) passes `sfdk check` with the widget
+      (verified on the SailfishOS-5.1.0.11 emulator, 2026-10-14)
+- [x] The Store RPM (main app) passes `sfdk check` with the widget
       QML inside `/usr/share/harbour-sahkonseuranta/qml/eventsview/`
-- [ ] Settings → Events view lists "Sähkönseuranta" with the
-      app icon
-- [ ] The widget appears on the Events View: ball, price, level name
+- [x] Settings → Events view lists "Sähkönseuranta" with the
+      app icon (emulator, 2026-10-14)
+- [x] The widget appears on the Events View: ball, price, level name
       and the level-change forecast match the app front page
-- [ ] The widget uses the app's thresholds: changing them in the app
-      and reopening the Events View recolors the widget
+      (verified against the live API on the emulator; also the
+      compact layout with the level on the price row)
+- [x] The widget uses the app's thresholds: changing them in the app
+      and reopening the Events View recolors the widget (threshold 5 →
+      4 verified end to end on the emulator)
 - [ ] 15 min vs 1 h resolution follows the app setting
-- [ ] The price updates within seconds after each quarter-hour
-      boundary while the Events View is shown
-- [ ] Leaving the Events View stops the polling (no fetches while the
-      home screen or an app is in the foreground)
-- [ ] Airplane mode: the widget shows "Ei yhteyttä" instead of
-      crashing Lipstick
+- [x] The price updates within seconds after each quarter-hour
+      boundary while the Events View is shown (price 2,72 → 4,016
+      observed across the 19:15 boundary with the view open)
+- [x] Leaving the Events View stops the polling (no fetches while the
+      home screen or an app is in the foreground; zero API
+      connections across the 19:30 boundary with the view closed)
+- [x] Airplane mode: the widget shows "Ei yhteyttä" instead of
+      crashing Lipstick (network cut on the emulator; Lipstick
+      stayed alive, and with stale data present the forecast line is
+      replaced by "Ei yhteyttä" so a stale price is labeled)
 - [ ] Lipstick survives enabling/disabling the widget in settings and
       uninstalling the companion RPM
+- [x] The app runs under sailjail with only the Internet permission;
+      its settings persist through the sandbox
+      (`~/.config/fi.zesseth/sahkonseuranta/settings.ini`) and the
+      widget reads them
 
 ## Test history
 
+- **2026-10-14** Events View widget functional testing on the
+  SailfishOS-5.1.0.11 SDK emulator (VirtualBox, WSL2 host, SDK 3.13.5):
+  - Fresh SFOS 5.1 emulator installed via `sfdk emulator install`
+    (a 5.x emulator image became available; the 4.6 emulator still
+    cannot run third-party widgets). App + companion RPM installed;
+    the widget loads inside Lipstick without a single QML/JS error.
+  - Live-data verification: the widget fetched from
+    api.porssisahko.net inside the Lipstick process (established
+    HTTPS connection observed), rendered the correct level color
+    cross-checked against the live API, updated across the
+    quarter-hour boundary, and stopped all polling while the Events
+    View was closed (zero connections across a boundary).
+  - Two real defects found and fixed:
+    1. The widget's settings fallback assumed `/home/nemo`; SFOS 5.x
+       uses `/home/defaultuser`, and the `/proc/self/environ` read
+       fails on the emulator, so the widget ignored the app's
+       thresholds. The widget now tries `$HOME`, then
+       `/home/defaultuser`, then `/home/nemo`, reading both the
+       sandboxed settings file and the legacy QSettings file.
+    2. The app's QSettings file (`~/.config/fi.zesseth/sahkonseuranta.conf`)
+       is NOT whitelisted by sailjail (only the `sahkonseuranta`
+       directory is), so user settings silently vanished in the
+       sandbox. Settings now persist at
+       `~/.config/fi.zesseth/sahkonseuranta/settings.ini` inside the
+       whitelisted directory; unit tests updated accordingly
+       (Settings 17 checks, 0 failures). Threshold change verified
+       end to end: app UI → settings.ini → widget recolor.
+  - Layout per user feedback: the level moved onto the price row and
+    the ball enlarged (less vertical space for notifications).
+  - Airplane mode (network cut on the emulator): Lipstick stayed
+    alive. Improvement made: a failed fetch with stale data now
+    replaces the forecast line with "Ei yhteyttä" instead of
+    silently showing an old price as current.
+  - Store validation re-run after every change: `sfdk check`
+    "Validation succeeded" (0 errors).
 - **2026-10-14** Second Events View widget review round (branch
   vibe/events-view-widget-2828ea, host build, SDK 3.13.5):
   - Unit tests re-run against the live API: PriceFetcher

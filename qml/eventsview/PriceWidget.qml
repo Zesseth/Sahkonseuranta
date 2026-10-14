@@ -167,13 +167,17 @@ Item {
         // The app persists its settings with QSettings under
         // fi.zesseth/sahkonseuranta; the widget reads the same file so
         // the level colors always match the app. HOME comes from the
-        // Lipstick process environment.
+        // Lipstick process environment; the environ read can fail
+        // (procfs reports a size of zero), and the standard user home
+        // differs between releases, so the standard homes are tried
+        // as well: /home/defaultuser on Sailfish OS 5.x and
+        // /home/nemo on 4.x and earlier.
         var environ = new XMLHttpRequest()
         environ.onreadystatechange = function() {
             if (environ.readyState !== XMLHttpRequest.DONE)
                 return
-            var home = "/home/nemo"
-            if (environ.readyState === XMLHttpRequest.DONE && environ.responseText.length > 0) {
+            var home = ""
+            if (environ.responseText.length > 0) {
                 // Entries are NUL-separated; anchor HOME= to
                 // the start of an entry so a variable such
                 // as XDG_CONFIG_HOME=/... is not mistaken for HOME
@@ -181,30 +185,49 @@ Item {
                 if (match)
                     home = match[1]
             }
-            readSettingsFile(home)
+            var homes = []
+            if (home && home !== "/home/defaultuser" && home !== "/home/nemo")
+                homes.push(home)
+            homes.push("/home/defaultuser")
+            homes.push("/home/nemo")
+            // The app stores its settings inside the
+            // sailjail-whitelisted fi.zesseth/sahkonseuranta directory;
+            // the legacy QSettings default file is read as well
+            var candidates = []
+            for (var i = 0; i < homes.length; ++i) {
+                candidates.push(homes[i] + "/.config/fi.zesseth/sahkonseuranta/settings.ini")
+                candidates.push(homes[i] + "/.config/fi.zesseth/sahkonseuranta.conf")
+            }
+            readNextSettingsFile(candidates, 0)
         }
         environ.open("GET", "file:///proc/self/environ")
         environ.send()
     }
 
-    function readSettingsFile(home) {
+    // Apply the first candidate settings file that has any of the keys
+    // the widget needs; missing files fall through silently
+    function readNextSettingsFile(candidates, index) {
+        if (index >= candidates.length)
+            return
         var conf = new XMLHttpRequest()
         conf.onreadystatechange = function() {
             if (conf.readyState !== XMLHttpRequest.DONE)
                 return
-            if (conf.responseText.length === 0)
-                return
             var cheap = conf.responseText.match(/^cheapThreshold=(\d+)$/m)
             var expensive = conf.responseText.match(/^expensiveThreshold=(\d+)$/m)
             var res = conf.responseText.match(/^resolution=(\d+)$/m)
-            if (cheap)
-                root.cheapThreshold = parseInt(cheap[1], 10)
-            if (expensive)
-                root.expensiveThreshold = parseInt(expensive[1], 10)
-            if (res && (parseInt(res[1], 10) === 15 || parseInt(res[1], 10) === 60))
-                root.resolution = parseInt(res[1], 10)
+            if (cheap || expensive || res) {
+                if (cheap)
+                    root.cheapThreshold = parseInt(cheap[1], 10)
+                if (expensive)
+                    root.expensiveThreshold = parseInt(expensive[1], 10)
+                if (res && (parseInt(res[1], 10) === 15 || parseInt(res[1], 10) === 60))
+                    root.resolution = parseInt(res[1], 10)
+                return
+            }
+            readNextSettingsFile(candidates, index + 1)
         }
-        conf.open("GET", "file://" + home + "/.config/fi.zesseth/sahkonseuranta.conf")
+        conf.open("GET", "file://" + candidates[index])
         conf.send()
     }
 
@@ -291,40 +314,53 @@ Item {
         y: Theme.paddingLarge
         spacing: Theme.paddingSmall
 
-        PriceBall {
-            price: root.displayPrice
-            cheapThreshold: root.cheapThreshold
-            expensiveThreshold: root.expensiveThreshold
-            hasData: root.hasData
-            priceFontSize: Theme.fontSizeLarge
-        }
+        // The current price and its level share one row so the widget
+        // stays compact and leaves room for the notifications below it
+        Row {
+            id: currentRow
+            spacing: Theme.paddingLarge
 
-        Label {
-            width: parent.width
-            visible: root.hasData
-            text: qsTr("Taso nyt: %1").arg(root.levelName(root.level))
-            color: Levels.levelColor(root.level)
-            font.pixelSize: Theme.fontSizeMedium
-            font.bold: true
+            PriceBall {
+                price: root.displayPrice
+                cheapThreshold: root.cheapThreshold
+                expensiveThreshold: root.expensiveThreshold
+                hasData: root.hasData
+                priceFontSize: Theme.fontSizeExtraLarge
+            }
+
+            Label {
+                anchors.verticalCenter: parent.verticalCenter
+                visible: root.hasData
+                text: qsTr("Taso nyt: %1").arg(root.levelName(root.level))
+                color: Levels.levelColor(root.level)
+                font.pixelSize: Theme.fontSizeMedium
+                font.bold: true
+            }
         }
 
         Label {
             width: parent.width
             visible: root.hasData
             wrapMode: Text.WordWrap
-            text: root.nextLevelEntry !== null
-                  ? qsTr("Vaihtuu %1 klo %2")
-                    .arg(root.levelNameIllative(
-                             Levels.levelOf(root.nextLevelEntry.price,
-                                           root.cheapThreshold,
-                                           root.expensiveThreshold)))
-                    .arg(root.formatTime(root.nextLevelEntry.start))
-                  : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan")
-            color: root.nextLevelEntry !== null
-                   ? Levels.levelColor(Levels.levelOf(root.nextLevelEntry.price,
-                                                      root.cheapThreshold,
-                                                      root.expensiveThreshold))
-                   : Theme.secondaryHighlightColor
+            // A failed fetch leaves the previous data on display; say so
+            // instead of showing a forecast the data cannot support
+            text: root.error
+                  ? qsTr("Ei yhteyttä")
+                  : (root.nextLevelEntry !== null
+                     ? qsTr("Vaihtuu %1 klo %2")
+                       .arg(root.levelNameIllative(
+                                Levels.levelOf(root.nextLevelEntry.price,
+                                              root.cheapThreshold,
+                                              root.expensiveThreshold)))
+                       .arg(root.formatTime(root.nextLevelEntry.start))
+                     : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan"))
+            color: root.error
+                   ? Theme.secondaryColor
+                   : (root.nextLevelEntry !== null
+                      ? Levels.levelColor(Levels.levelOf(root.nextLevelEntry.price,
+                                                         root.cheapThreshold,
+                                                         root.expensiveThreshold))
+                      : Theme.secondaryHighlightColor)
             font.pixelSize: Theme.fontSizeSmall
         }
 
