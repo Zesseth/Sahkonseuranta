@@ -1,0 +1,25 @@
+Name: harbour-sahkonseuranta-widget
+Summary: Events View widget registration for Sähkönseuranta
+Description: |
+  Registers the Sähkönseuranta Events View widget with Lipstick.
+  This package only installs the widget registration JSON under
+  /usr/share/lipstick/eventswidgets/ and requires the main
+  harbour-sahkonseuranta application RPM, which ships the widget QML.
+  The Jolla Store RPM validator does not allow files outside the
+  application's own directories, so this companion package is
+  distributed via OpenRepos/Chum and cannot ship in the Store build.
+Version: 1.1.0
+Release: 1
+Group: Qt/Qt
+License: AGPL-3.0-or-later
+SCM: https://github.com/Zesseth/Sahkonseuranta
+URL: https://github.com/Zesseth/Sahkonseuranta
+Sources:
+  - '%{name}-%{version}.tar.bz2'
+Configure: none
+Builder: none
+Architectures: noarch
+Requires:
+  - harbour-sahkonseuranta >= 1.1.0
+Files:
+  - '%{_datadir}/lipstick/eventswidgets/harbour-sahkonseuranta.json'

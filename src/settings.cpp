@@ -1,7 +1,9 @@
 /* SPDX-License-Identifier: AGPL-3.0-or-later */
 #include "settings.h"
 
+#include <QDir>
 #include <QSettings>
+#include <QStandardPaths>
 
 namespace {
 const char *kKeyCheap = "cheapThreshold";
@@ -10,6 +12,19 @@ const char *kKeyResolution = "resolution";
 // The green threshold must always be strictly below the red one.
 // Thresholds are whole cents.
 const double kMinThresholdGap = 1.0;
+}
+
+// The Sailfish sandbox (sailjail) whitelists ${HOME}/.config/<org>/<app>
+// as a directory but not the QSettings default file <org>/<app>.conf,
+// so the settings are stored inside the whitelisted directory instead.
+QString Settings::settingsFilePath(const QString &organization,
+                                   const QString &application)
+{
+    const QString configDir = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+    QDir dir(configDir + QLatin1Char('/') + organization
+             + QLatin1Char('/') + application);
+    dir.mkpath(QStringLiteral("."));
+    return dir.filePath(QStringLiteral("settings.ini"));
 }
 
 Settings::Settings(QObject *parent, const QString &organization, const QString &application)
@@ -76,7 +91,7 @@ void Settings::setResolution(int res)
 
 void Settings::load()
 {
-    QSettings s(m_organization, m_application);
+    QSettings s(settingsFilePath(m_organization, m_application), QSettings::IniFormat);
     m_cheap = s.value(QString::fromLatin1(kKeyCheap), 5.0).toDouble();
     if (m_cheap < 0.0)
         m_cheap = 0.0;
@@ -93,7 +108,7 @@ void Settings::load()
 
 void Settings::save()
 {
-    QSettings s(m_organization, m_application);
+    QSettings s(settingsFilePath(m_organization, m_application), QSettings::IniFormat);
     s.setValue(QString::fromLatin1(kKeyCheap), m_cheap);
     s.setValue(QString::fromLatin1(kKeyExpensive), m_expensive);
     s.setValue(QString::fromLatin1(kKeyResolution), m_resolution);

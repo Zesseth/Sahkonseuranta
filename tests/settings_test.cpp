@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: AGPL-3.0-or-later */
 #include "settings.h"
 #include <QCoreApplication>
+#include <QFile>
 #include <QSettings>
 #include <cstdio>
 #include <cstdlib>
@@ -28,7 +29,7 @@ int main(int argc, char *argv[])
     // Test-scoped QSettings so the real app configuration is untouched.
     const QString org = QStringLiteral("sahkonseuranta-test");
     const QString appl = QStringLiteral("settings-test");
-    QSettings(org, appl).clear();
+    QFile::remove(Settings::settingsFilePath(org, appl));
 
     Settings s(nullptr, org, appl);
     check(s.cheapThreshold() == 5.0, "default cheap threshold is 5.0");
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
     check(s2.expensiveThreshold() == 8.0, "expensive threshold persisted");
     check(s2.resolution() == 60, "resolution persisted");
 
-    QSettings(org, appl).clear();
+    QFile::remove(Settings::settingsFilePath(org, appl));
 
     printf("\n%d checks, %d failures\n", g_checks, g_failures);
     return g_failures == 0 ? 0 : 1;
