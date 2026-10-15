@@ -8,7 +8,7 @@ Description: |
   The Jolla Store RPM validator does not allow files outside the
   application's own directories, so this companion package is
   distributed via OpenRepos/Chum and cannot ship in the Store build.
-Version: 1.0.0
+Version: 1.1.0
 Release: 1
 Group: Qt/Qt
 License: AGPL-3.0-or-later
@@ -20,6 +20,6 @@ Configure: none
 Builder: none
 Architectures: noarch
 Requires:
-  - harbour-sahkonseuranta >= 1.0.0
+  - harbour-sahkonseuranta >= 1.1.0
 Files:
   - '%{_datadir}/lipstick/eventswidgets/harbour-sahkonseuranta.json'

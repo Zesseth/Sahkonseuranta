@@ -160,8 +160,8 @@ Build and install:
 
 ```bash
 cd widget && sfdk build   # noarch RPM
-rpm -U harbour-sahkonseuranta-1.0.0-11.i486.rpm \
-       harbour-sahkonseuranta-widget-1.0.0-1.noarch.rpm
+rpm -U harbour-sahkonseuranta-1.1.0-1.i486.rpm \
+       harbour-sahkonseuranta-widget-1.1.0-1.noarch.rpm
 ```
 
 - [x] Descriptor is valid JSON and installs to

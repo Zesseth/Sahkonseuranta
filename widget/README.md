@@ -70,7 +70,7 @@ The split therefore keeps the main Store package clean:
 
 Install the main app, then install the companion RPM:
 
-    pkcon install-local harbour-sahkonseuranta-widget-1.0.0-1.noarch.rpm
+    pkcon install-local harbour-sahkonseuranta-widget-1.1.0-1.noarch.rpm
 
 The widget appears in **Settings → Events view** and is enabled by
 default (`default_enabled: true`). Uninstalling the main app while
@@ -82,7 +82,7 @@ that.
 
 ```bash
 cd widget
-sfdk build          # produces RPMS/.../harbour-sahkonseuranta-widget-1.0.0-1.noarch.rpm
+sfdk build          # produces RPMS/.../harbour-sahkonseuranta-widget-1.1.0-1.noarch.rpm
 ```
 
 ## Limitations

@@ -1,7 +1,7 @@
 Name: harbour-sahkonseuranta
 Summary: Electricity spot price tracking
-Version: 1.0.0
-Release: 11
+Version: 1.1.0
+Release: 1
 Group: Qt/Qt
 License: AGPL-3.0-or-later
 SCM: https://github.com/Zesseth/Sahkonseuranta
