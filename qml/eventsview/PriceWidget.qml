@@ -341,9 +341,11 @@ Item {
         Label {
             width: parent.width
             visible: root.hasData
+            height: visible ? implicitHeight : 0
             wrapMode: Text.WordWrap
             // A failed fetch leaves the previous data on display; say so
-            // instead of showing a forecast the data cannot support
+            // instead of showing a forecast the data cannot support.
+            // Error text uses the same Theme.errorColor as the main page.
             text: root.error
                   ? qsTr("Ei yhteyttä")
                   : (root.nextLevelEntry !== null
@@ -355,7 +357,7 @@ Item {
                        .arg(root.formatTime(root.nextLevelEntry.start))
                      : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan"))
             color: root.error
-                   ? Theme.secondaryColor
+                   ? Theme.errorColor
                    : (root.nextLevelEntry !== null
                       ? Levels.levelColor(Levels.levelOf(root.nextLevelEntry.price,
                                                          root.cheapThreshold,
@@ -364,13 +366,17 @@ Item {
             font.pixelSize: Theme.fontSizeSmall
         }
 
+        // No-data placeholder follows the main page states: loading is
+        // highlighted, an idle empty state is secondary text
         Label {
             width: parent.width
             visible: !root.hasData
+            height: visible ? implicitHeight : 0
+            wrapMode: Text.WordWrap
             text: root.loading ? qsTr("Ladataan...")
                               : (root.error ? qsTr("Ei yhteyttä") : qsTr("Ei tietoja"))
-            color: Theme.secondaryColor
-            font.pixelSize: Theme.fontSizeMedium
+            color: root.loading ? Theme.highlightColor : Theme.secondaryColor
+            font.pixelSize: Theme.fontSizeLarge
         }
     }
 }
