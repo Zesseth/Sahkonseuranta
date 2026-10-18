@@ -81,6 +81,14 @@ sfdk config target=SailfishOS-4.6.0.13-armv7hl && sfdk build
 A successful build produces
 `RPMS/armv7hl/harbour-sahkonseuranta-0.1.0-1.*.rpm`.
 
+## AI usage
+
+The use of AI tools, and the decision whether to use them at all, is
+left to each developer. The developer is always responsible for the
+code they contribute and for everything that ends up in the project,
+including reviewing and verifying any AI-assisted work before it is
+merged.
+
 ## Unit testing without the SDK
 
 The `PriceFetcher` backend class does not depend on Silica, so it can be
