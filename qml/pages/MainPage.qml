@@ -192,10 +192,6 @@ Page {
                 visible: priceFetcher.hasData
                 height: visible ? implicitHeight : 0
 
-                SectionHeader {
-                    text: qsTr("Alin · Keskiarvo · Ylin")
-                }
-
                 Row {
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2 * Theme.horizontalPageMargin

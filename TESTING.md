@@ -126,9 +126,10 @@ The custom card rectangles were replaced with native Silica sections
 main and settings pages, and the chart axis sizes now derive from
 `Theme` font metrics. Beyond the generic checklist above, verify:
 
-- [ ] Main page shows three sections ("Hinta on nyt klo …", "Alin ·
-      Keskiarvo · Ylin", "Vartin hinnat c/kWh" / "Tunnin keskiarvot
-      c/kWh") with no card backgrounds or rounded boxes
+- [ ] Main page shows the section headers ("Hinta on nyt klo …",
+      "Vartin hinnat c/kWh" / "Tunnin keskiarvot c/kWh") with the
+      min/average/max stat row directly below the level section and
+      no card backgrounds or rounded boxes
 - [ ] The level ball, level name and forecast rows are aligned and
       readable on both small (720p) and large (2160p) screens
 - [ ] Chart x/y axis labels are not clipped and do not overlap the

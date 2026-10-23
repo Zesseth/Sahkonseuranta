@@ -9,8 +9,8 @@ Name:       harbour-sahkonseuranta
 # << macros
 
 Summary:    Electricity spot price tracking
-Version:    1.0.0
-Release:    11
+Version:    1.0.1
+Release:    1
 Group:      Qt/Qt
 License:    AGPL-3.0-or-later
 URL:        https://github.com/Zesseth/Sahkonseuranta
@@ -72,6 +72,9 @@ desktop-file-install --delete-original       \
 # << files
 
 %changelog
+* Fri Oct 23 2026 Zesseth <jlahtela@users.noreply.github.com> 1.0.1-1
+- Strict Silica UI: replace custom cards with sections, collapse the
+  hidden no-data sections, guard the About link
 * Sun Oct 12 2026 Zesseth <jlahtela@users.noreply.github.com> 1.0.0-1
 - First store release candidate: AGPL-3.0-or-later relicense, redesigned
   main page with the scrollable chart, configurable price thresholds
