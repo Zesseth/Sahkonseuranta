@@ -119,6 +119,42 @@ sfdk emulator --armv7hl   # or the x86 VM
          the background
    - [ ] Airplane mode: "Päivitä" shows an error instead of crashing
 
+### Emulator UI checks specific to the strict Silica rework (PR #28)
+
+The custom card rectangles were replaced with native Silica sections
+(`SectionHeader` + plain columns/rows, `Theme` margins and colors) on the
+main and settings pages, and the chart axis sizes now derive from
+`Theme` font metrics. Beyond the generic checklist above, verify:
+
+- [ ] Main page shows three sections ("Hinta on nyt klo …", "Alin ·
+      Keskiarvo · Ylin", "Vartin hinnat c/kWh" / "Tunnin keskiarvot
+      c/kWh") with no card backgrounds or rounded boxes
+- [ ] The level ball, level name and forecast rows are aligned and
+      readable on both small (720p) and large (2160p) screens
+- [ ] Chart x/y axis labels are not clipped and do not overlap the
+      bars at the default font size, and axis size follows the system
+      font size setting
+- [ ] With no data (fresh install before the first fetch, or offline):
+      the loading / "Ei tietoja" label is shown near the top and the
+      page below it is compact — there must be no large empty
+      scrollable area
+- [ ] With no data and a failed fetch: the error text appears below
+      the placeholder label (highlight color while loading, error
+      color after failure)
+- [ ] Settings page: thresholds and resolution are grouped under
+      "Hintarajat" / "Graafin tarkkuus" / "Tietoja" section headers;
+      no pinned About box at the bottom
+- [ ] Settings persist when navigating back (thresholds apply on page
+      deactivation, not only on app exit): edit a threshold, navigate
+      back, kill the app from the recents view, relaunch — the value
+      is still there
+- [ ] Threshold change recolors the ball and chart bars on the main
+      page after returning to it
+- [ ] The GitHub link in the "Tietoja" section opens the browser at
+      https://github.com/Zesseth/Sahkonseuranta
+- [ ] PullDownMenu -> "Päivitä" and "Asetukset" still work with the
+      new section layout
+
 ## 4. Device testing (Jolla Phone 2026)
 
 ```bash
