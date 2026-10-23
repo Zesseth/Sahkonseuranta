@@ -112,19 +112,6 @@ Item {
         return qsTr("keskitasoon")
     }
 
-    // "HH:mm", with the weekday abbreviation appended when the moment
-    // is not today (same rule as the app uses)
-    function formatTime(t) {
-        function pad(n) { return n < 10 ? "0" + n : "" + n }
-        var text = pad(t.getHours()) + ":" + pad(t.getMinutes())
-        var now = new Date()
-        if (t.getFullYear() === now.getFullYear() && t.getMonth() === now.getMonth()
-                && t.getDate() === now.getDate())
-            return text
-        var names = [qsTr("Su"), qsTr("Ma"), qsTr("Ti"), qsTr("Ke"), qsTr("To"), qsTr("Pe"), qsTr("La")]
-        return text + " " + names[t.getDay()]
-    }
-
     // Time the next fetch a few seconds after the next quarter-hour
     // boundary, when the spot price changes
     function msToNextBoundary() {
@@ -314,21 +301,10 @@ Item {
         y: Theme.paddingLarge
         spacing: Theme.paddingSmall
 
-        // Level name on its own top row so the ball row below stays
-        // compact and leaves room for the notifications
-        Label {
-            width: parent.width
-            visible: root.hasData
-            height: visible ? implicitHeight : 0
-            text: qsTr("Taso nyt: %1").arg(root.levelName(root.level))
-            color: Levels.levelColor(root.level)
-            font.pixelSize: Theme.fontSizeMedium
-            font.bold: true
-        }
-
-        // The current price (ball + value) with the level-change
-        // forecast beside it, vertically centered in the middle of
-        // the widget
+        // The current price (ball + value) with the level name on top
+        // and the level-change forecast right below it — the same
+        // structure as the app's main page, without the extra time
+        // and price detail line that the widget does not show
         Row {
             id: currentRow
             spacing: Theme.paddingLarge
@@ -344,31 +320,42 @@ Item {
                 priceFontSize: Theme.fontSizeExtraLarge
             }
 
-            Label {
+            Column {
                 anchors.verticalCenter: parent.verticalCenter
                 width: content.width - ball.width - parent.spacing
-                wrapMode: Text.WordWrap
-                // A failed fetch leaves the previous data on display; say so
-                // instead of showing a forecast the data cannot support.
-                // Error text uses the same Theme.errorColor as the main page.
-                text: root.error
-                      ? qsTr("Ei yhteyttä")
-                      : (root.nextLevelEntry !== null
-                         ? qsTr("Vaihtuu %1 klo %2")
-                           .arg(root.levelNameIllative(
-                                    Levels.levelOf(root.nextLevelEntry.price,
-                                                  root.cheapThreshold,
-                                                  root.expensiveThreshold)))
-                           .arg(root.formatTime(root.nextLevelEntry.start))
-                         : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan"))
-                color: root.error
-                       ? Theme.errorColor
-                       : (root.nextLevelEntry !== null
-                          ? Levels.levelColor(Levels.levelOf(root.nextLevelEntry.price,
-                                                             root.cheapThreshold,
-                                                             root.expensiveThreshold))
-                          : Theme.secondaryHighlightColor)
-                font.pixelSize: Theme.fontSizeSmall
+                spacing: Theme.paddingSmall
+
+                Label {
+                    text: qsTr("Taso nyt: %1").arg(root.levelName(root.level))
+                    color: Levels.levelColor(root.level)
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.bold: true
+                }
+
+                Label {
+                    width: parent.width
+                    wrapMode: Text.WordWrap
+                    // A failed fetch leaves the previous data on display; say so
+                    // instead of showing a forecast the data cannot support.
+                    // Error text uses the same Theme.errorColor as the main page.
+                    text: root.error
+                          ? qsTr("Ei yhteyttä")
+                          : (root.nextLevelEntry !== null
+                             ? qsTr("Vaihtuu %1")
+                               .arg(root.levelNameIllative(
+                                        Levels.levelOf(root.nextLevelEntry.price,
+                                                      root.cheapThreshold,
+                                                      root.expensiveThreshold)))
+                             : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan"))
+                    color: root.error
+                           ? Theme.errorColor
+                           : (root.nextLevelEntry !== null
+                              ? Levels.levelColor(Levels.levelOf(root.nextLevelEntry.price,
+                                                                 root.cheapThreshold,
+                                                                 root.expensiveThreshold))
+                              : Theme.secondaryHighlightColor)
+                    font.pixelSize: Theme.fontSizeSmall
+                }
             }
         }
 
