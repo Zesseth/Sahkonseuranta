@@ -124,7 +124,12 @@ Page {
                 linkColor: Theme.primaryColor
                 font.pixelSize: Theme.fontSizeMedium
                 textFormat: Text.RichText
-                onLinkActivated: Qt.openUrlExternally(link)
+                // The link is hardcoded above; only open the exact
+                // expected URL, nothing a modified rich text could inject
+                onLinkActivated: {
+                    if (link === "https://github.com/Zesseth/Sahkonseuranta")
+                        Qt.openUrlExternally(link)
+                }
             }
         }
     }

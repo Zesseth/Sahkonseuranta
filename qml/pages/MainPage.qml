@@ -121,6 +121,9 @@ Page {
                 width: parent.width
                 spacing: Theme.paddingMedium
                 visible: priceFetcher.hasData
+                // Positioners keep space for invisible items: collapse
+                // so the no-data page is not followed by empty scroll
+                height: visible ? implicitHeight : 0
 
                 SectionHeader {
                     text: qsTr("Hinta on nyt klo %1").arg(page.currentPeriodStart())
@@ -187,6 +190,7 @@ Page {
                 width: parent.width
                 spacing: Theme.paddingMedium
                 visible: priceFetcher.hasData
+                height: visible ? implicitHeight : 0
 
                 SectionHeader {
                     text: qsTr("Alin · Keskiarvo · Ylin")
@@ -310,6 +314,7 @@ Page {
                 width: parent.width
                 spacing: Theme.paddingSmall
                 visible: priceFetcher.hasData
+                height: visible ? implicitHeight : 0
 
                 SectionHeader {
                     id: chartCaption
