@@ -106,9 +106,9 @@ Item {
 
     function levelNameIllative(lvl) {
         if (lvl === 0)
-            return qsTr("halvan tasoon")
+            return qsTr("halpaan tasoon")
         if (lvl === 2)
-            return qsTr("kalliin tasoon")
+            return qsTr("kalliiseen tasoon")
         return qsTr("keskitasoon")
     }
 
@@ -314,13 +314,29 @@ Item {
         y: Theme.paddingLarge
         spacing: Theme.paddingSmall
 
-        // The current price and its level share one row so the widget
-        // stays compact and leaves room for the notifications below it
+        // Level name on its own top row so the ball row below stays
+        // compact and leaves room for the notifications
+        Label {
+            width: parent.width
+            visible: root.hasData
+            height: visible ? implicitHeight : 0
+            text: qsTr("Taso nyt: %1").arg(root.levelName(root.level))
+            color: Levels.levelColor(root.level)
+            font.pixelSize: Theme.fontSizeMedium
+            font.bold: true
+        }
+
+        // The current price (ball + value) with the level-change
+        // forecast beside it, vertically centered in the middle of
+        // the widget
         Row {
             id: currentRow
             spacing: Theme.paddingLarge
+            visible: root.hasData
+            height: visible ? implicitHeight : 0
 
             PriceBall {
+                id: ball
                 price: root.displayPrice
                 cheapThreshold: root.cheapThreshold
                 expensiveThreshold: root.expensiveThreshold
@@ -330,40 +346,30 @@ Item {
 
             Label {
                 anchors.verticalCenter: parent.verticalCenter
-                visible: root.hasData
-                text: qsTr("Taso nyt: %1").arg(root.levelName(root.level))
-                color: Levels.levelColor(root.level)
-                font.pixelSize: Theme.fontSizeMedium
-                font.bold: true
+                width: content.width - ball.width - parent.spacing
+                wrapMode: Text.WordWrap
+                // A failed fetch leaves the previous data on display; say so
+                // instead of showing a forecast the data cannot support.
+                // Error text uses the same Theme.errorColor as the main page.
+                text: root.error
+                      ? qsTr("Ei yhteyttä")
+                      : (root.nextLevelEntry !== null
+                         ? qsTr("Vaihtuu %1 klo %2")
+                           .arg(root.levelNameIllative(
+                                    Levels.levelOf(root.nextLevelEntry.price,
+                                                  root.cheapThreshold,
+                                                  root.expensiveThreshold)))
+                           .arg(root.formatTime(root.nextLevelEntry.start))
+                         : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan"))
+                color: root.error
+                       ? Theme.errorColor
+                       : (root.nextLevelEntry !== null
+                          ? Levels.levelColor(Levels.levelOf(root.nextLevelEntry.price,
+                                                             root.cheapThreshold,
+                                                             root.expensiveThreshold))
+                          : Theme.secondaryHighlightColor)
+                font.pixelSize: Theme.fontSizeSmall
             }
-        }
-
-        Label {
-            width: parent.width
-            visible: root.hasData
-            height: visible ? implicitHeight : 0
-            wrapMode: Text.WordWrap
-            // A failed fetch leaves the previous data on display; say so
-            // instead of showing a forecast the data cannot support.
-            // Error text uses the same Theme.errorColor as the main page.
-            text: root.error
-                  ? qsTr("Ei yhteyttä")
-                  : (root.nextLevelEntry !== null
-                     ? qsTr("Vaihtuu %1 klo %2")
-                       .arg(root.levelNameIllative(
-                                Levels.levelOf(root.nextLevelEntry.price,
-                                              root.cheapThreshold,
-                                              root.expensiveThreshold)))
-                       .arg(root.formatTime(root.nextLevelEntry.start))
-                     : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan"))
-            color: root.error
-                   ? Theme.errorColor
-                   : (root.nextLevelEntry !== null
-                      ? Levels.levelColor(Levels.levelOf(root.nextLevelEntry.price,
-                                                         root.cheapThreshold,
-                                                         root.expensiveThreshold))
-                      : Theme.secondaryHighlightColor)
-            font.pixelSize: Theme.fontSizeSmall
         }
 
         // No-data placeholder follows the main page states: loading is

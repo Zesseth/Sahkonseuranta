@@ -28,9 +28,9 @@ Page {
 
     function levelNameIllative(level) {
         if (level === 0)
-            return qsTr("halvan tasoon")
+            return qsTr("halpaan tasoon")
         if (level === 2)
-            return qsTr("kalliin tasoon")
+            return qsTr("kalliiseen tasoon")
         return qsTr("keskitasoon")
     }
 
