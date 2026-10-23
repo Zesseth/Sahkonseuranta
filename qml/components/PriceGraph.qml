@@ -33,8 +33,8 @@ Item {
         if (bars.length > 0 && nowIndex >= 0)
             scrollToNow()
     }
-    readonly property int xAxisHeight: 22
-    readonly property int yAxisWidth: 44
+    readonly property int xAxisHeight: Theme.fontSizeTiny + 2 * Theme.paddingSmall
+    readonly property int yAxisWidth: 2 * Theme.paddingSmall + Theme.fontSizeTiny * 1.6
 
     // Data-driven value range of the visible window (whole cents)
     readonly property double dataMax: {
