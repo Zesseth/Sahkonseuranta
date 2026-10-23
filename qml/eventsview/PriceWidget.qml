@@ -112,6 +112,19 @@ Item {
         return qsTr("keskitasoon")
     }
 
+    // "HH:mm", with the weekday abbreviation appended when the moment
+    // is not today (same rule as the app uses)
+    function formatTime(t) {
+        function pad(n) { return n < 10 ? "0" + n : "" + n }
+        var text = pad(t.getHours()) + ":" + pad(t.getMinutes())
+        var now = new Date()
+        if (t.getFullYear() === now.getFullYear() && t.getMonth() === now.getMonth()
+                && t.getDate() === now.getDate())
+            return text
+        var names = [qsTr("Su"), qsTr("Ma"), qsTr("Ti"), qsTr("Ke"), qsTr("To"), qsTr("Pe"), qsTr("La")]
+        return text + " " + names[t.getDay()]
+    }
+
     // Time the next fetch a few seconds after the next quarter-hour
     // boundary, when the spot price changes
     function msToNextBoundary() {
@@ -341,11 +354,12 @@ Item {
                     text: root.error
                           ? qsTr("Ei yhteyttä")
                           : (root.nextLevelEntry !== null
-                             ? qsTr("Vaihtuu %1")
+                             ? qsTr("Vaihtuu %1 klo %2")
                                .arg(root.levelNameIllative(
                                         Levels.levelOf(root.nextLevelEntry.price,
                                                       root.cheapThreshold,
                                                       root.expensiveThreshold)))
+                               .arg(root.formatTime(root.nextLevelEntry.start))
                              : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan"))
                     color: root.error
                            ? Theme.errorColor
