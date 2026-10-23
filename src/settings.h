@@ -20,6 +20,9 @@ public:
                        const QString &organization = QStringLiteral("fi.zesseth"),
                        const QString &application = QStringLiteral("sahkonseuranta"));
 
+    static QString settingsFilePath(const QString &organization,
+                                    const QString &application);
+
     double cheapThreshold() const;
     void setCheapThreshold(double value);
     double expensiveThreshold() const;

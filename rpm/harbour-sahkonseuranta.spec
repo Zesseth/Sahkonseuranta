@@ -9,7 +9,7 @@ Name:       harbour-sahkonseuranta
 # << macros
 
 Summary:    Electricity spot price tracking
-Version:    1.0.1
+Version:    1.1.0
 Release:    1
 Group:      Qt/Qt
 License:    AGPL-3.0-or-later
@@ -72,9 +72,14 @@ desktop-file-install --delete-original       \
 # << files
 
 %changelog
+* Fri Oct 23 2026 Zesseth <jlahtela@users.noreply.github.com> 1.1.0-1
+- SailfishOS Events View widget (Sailfish OS 5.x): current spot price,
+  level ball and level-change forecast on the home screen Events View
+- Settings now persist through the Sailfish sandbox
+- Failed fetch keeps the last data labeled with "Ei yhteyttä"
 * Fri Oct 23 2026 Zesseth <jlahtela@users.noreply.github.com> 1.0.1-1
 - Strict Silica UI: replace custom cards with sections, collapse the
   hidden no-data sections, guard the About link
-* Sun Oct 12 2026 Zesseth <jlahtela@users.noreply.github.com> 1.0.0-1
+* Mon Oct 12 2026 Zesseth <jlahtela@users.noreply.github.com> 1.0.0-1
 - First store release candidate: AGPL-3.0-or-later relicense, redesigned
   main page with the scrollable chart, configurable price thresholds
