@@ -9,10 +9,6 @@ Page {
 
     Component.onCompleted: priceFetcher.refresh()
 
-    // Card background shared by all boxes
-    readonly property color cardColor: Theme.rgba(Theme.highlightBackgroundColor, 0.2)
-    readonly property int cardRadius: Theme.paddingLarge
-
     function fmtPrice(v) {
         return v.toFixed(2).replace(".", ",")
     }
@@ -96,96 +92,19 @@ Page {
                 title: qsTr("Pörssisähkö tänään")
             }
 
-            // Box 1: price level now + forecast of how long it holds
-            Rectangle {
-                id: priceCard
+            // No data or loading placeholder
+            Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                height: priceBox1Column.height + 2 * Theme.paddingLarge
-                radius: page.cardRadius
-                color: page.cardColor
-                visible: priceFetcher.hasData || priceFetcher.loading
-
-                Column {
-                    id: priceBox1Column
-                    x: Theme.paddingLarge
-                    width: parent.width - 2 * Theme.paddingLarge
-                    y: Theme.paddingLarge
-                    spacing: Theme.paddingSmall
-
-                    Label {
-                        visible: priceFetcher.hasData
-                        text: qsTr("Hinta on nyt klo %1")
-                              .arg(page.currentPeriodStart())
-                        color: Theme.primaryColor
-                        font.pixelSize: Theme.fontSizeMedium
-                    }
-
-                    // Ball on the left, level and forecast beside it
-                    Row {
-                        visible: priceFetcher.hasData
-                        width: parent.width
-                        spacing: Theme.paddingLarge
-
-                        PriceBall {
-                            id: ball
-                            price: priceFetcher.displayPrice
-                            cheapThreshold: appSettings.cheapThreshold
-                            expensiveThreshold: appSettings.expensiveThreshold
-                            hasData: priceFetcher.hasData
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-
-                        Column {
-                            width: parent.width - ball.width - parent.spacing
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.paddingSmall
-
-                            Label {
-                                text: qsTr("Taso nyt: %1")
-                                      .arg(page.levelName(page.levelOf(priceFetcher.displayPrice)))
-                                color: page.levelColor(page.levelOf(priceFetcher.displayPrice))
-                                font.pixelSize: Theme.fontSizeMedium
-                                font.bold: true
-                            }
-
-                            Label {
-                                id: levelChangeLabel
-                                width: parent.width
-                                wrapMode: Text.WordWrap
-                                text: page.nextLevel !== null
-                                      ? qsTr("Vaihtuu %1")
-                                            .arg(page.levelNameIllative(page.levelOf(page.nextLevel.price)))
-                                      : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan")
-                                color: page.nextLevel !== null
-                                       ? page.levelColor(page.levelOf(page.nextLevel.price))
-                                       : Theme.secondaryHighlightColor
-                                font.pixelSize: Theme.fontSizeSmall
-                            }
-
-                            Label {
-                                visible: page.nextLevel !== null
-                                text: page.nextLevel !== null
-                                      ? qsTr("klo %1 · %2 snt/kWh")
-                                            .arg(Qt.formatDateTime(page.nextLevel.start, "HH:mm"))
-                                            .arg(page.fmtPrice(page.nextLevel.price))
-                                      : ""
-                                color: Theme.secondaryHighlightColor
-                                font.pixelSize: Theme.fontSizeSmall
-                            }
-                        }
-                    }
-
-                    Label {
-                        visible: !priceFetcher.hasData
-                        text: priceFetcher.loading ? qsTr("Ladataan...") : qsTr("Ei tietoja")
-                        color: Theme.secondaryColor
-                        font.pixelSize: Theme.fontSizeLarge
-                    }
-                }
+                visible: !priceFetcher.hasData
+                text: priceFetcher.loading ? qsTr("Ladataan...") : qsTr("Ei tietoja")
+                color: priceFetcher.loading ? Theme.highlightColor : Theme.secondaryColor
+                font.pixelSize: Theme.fontSizeLarge
+                wrapMode: Text.WordWrap
+                height: visible ? implicitHeight : 0
             }
 
-            // Error text when there is no box to show it in
+            // Error text when there is no data to show
             Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
@@ -193,178 +112,231 @@ Page {
                 text: priceFetcher.errorString
                 color: Theme.errorColor
                 wrapMode: Text.WordWrap
+                height: visible ? implicitHeight : 0
             }
 
-            // Box 2: price now at clock + period, and chart window stats
-            Rectangle {
-                id: statsCard
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                height: statsColumn.height + 2 * Theme.paddingLarge
-                radius: page.cardRadius
-                color: page.cardColor
+            // Section 1: price level now + forecast of how long it holds
+            Column {
+                id: levelSection
+                width: parent.width
+                spacing: Theme.paddingMedium
                 visible: priceFetcher.hasData
+                // Positioners keep space for invisible items: collapse
+                // so the no-data page is not followed by empty scroll
+                height: visible ? implicitHeight : 0
 
-                Column {
-                    id: statsColumn
-                    x: Theme.paddingLarge
-                    width: parent.width - 2 * Theme.paddingLarge
-                    y: Theme.paddingLarge
-                    spacing: Theme.paddingMedium
+                SectionHeader {
+                    text: qsTr("Hinta on nyt klo %1").arg(page.currentPeriodStart())
+                }
 
-                    Row {
-                        width: parent.width
-                        spacing: Theme.paddingLarge
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    spacing: Theme.paddingLarge
 
-                        Column {
-                            width: (parent.width - 2 * parent.spacing) / 3
-                            spacing: 2
+                    PriceBall {
+                        id: ball
+                        price: priceFetcher.displayPrice
+                        cheapThreshold: appSettings.cheapThreshold
+                        expensiveThreshold: appSettings.expensiveThreshold
+                        hasData: priceFetcher.hasData
+                        anchors.verticalCenter: parent.verticalCenter
+                    }
 
-                            Label {
-                                text: qsTr("Alin")
-                                color: Theme.secondaryHighlightColor
-                                font.pixelSize: Theme.fontSizeSmall
-                            }
-                            Row {
-                                spacing: Theme.paddingSmall
+                    Column {
+                        width: parent.width - ball.width - parent.spacing
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: Theme.paddingSmall
 
-                                Label {
-                                    id: minValue
-                                    text: page.fmtPrice(priceFetcher.minPrice)
-                                    color: Theme.highlightColor
-                                    font.pixelSize: Theme.fontSizeLarge
-                                    font.bold: true
-                                }
-                                Label {
-                                    anchors.baseline: minValue.baseline
-                                    text: qsTr("snt/kWh")
-                                    color: Theme.secondaryColor
-                                    font.pixelSize: Theme.fontSizeExtraSmall
-                                }
-                            }
-                            Label {
-                                text: priceFetcher.minTimeText
-                                color: Theme.secondaryColor
-                                font.pixelSize: Theme.fontSizeTiny
-                                visible: priceFetcher.minTimeText !== ""
-                            }
+                        Label {
+                            text: qsTr("Taso nyt: %1")
+                                  .arg(page.levelName(page.levelOf(priceFetcher.displayPrice)))
+                            color: page.levelColor(page.levelOf(priceFetcher.displayPrice))
+                            font.pixelSize: Theme.fontSizeLarge
+                            font.bold: true
                         }
 
-                        Column {
-                            width: (parent.width - 2 * parent.spacing) / 3
-                            spacing: 2
-
-                            Label {
-                                text: qsTr("Keskiarvo")
-                                color: Theme.secondaryHighlightColor
-                                font.pixelSize: Theme.fontSizeSmall
-                            }
-                            Row {
-                                spacing: Theme.paddingSmall
-
-                                Label {
-                                    id: avgValue
-                                    text: page.fmtPrice(priceFetcher.avgPrice)
-                                    color: Theme.highlightColor
-                                    font.pixelSize: Theme.fontSizeLarge
-                                    font.bold: true
-                                }
-                                Label {
-                                    anchors.baseline: avgValue.baseline
-                                    text: qsTr("snt/kWh")
-                                    color: Theme.secondaryColor
-                                    font.pixelSize: Theme.fontSizeExtraSmall
-                                }
-                            }
-                            Label {
-                                text: priceFetcher.windowSpanText
-                                color: Theme.secondaryColor
-                                font.pixelSize: Theme.fontSizeTiny
-                                visible: priceFetcher.windowSpanText !== ""
-                            }
+                        Label {
+                            id: levelChangeLabel
+                            width: parent.width
+                            wrapMode: Text.WordWrap
+                            text: page.nextLevel !== null
+                                  ? qsTr("Vaihtuu %1")
+                                        .arg(page.levelNameIllative(page.levelOf(page.nextLevel.price)))
+                                  : qsTr("Hinta pysyy tällä tasolla koko näytettävän ajan")
+                            color: page.nextLevel !== null
+                                   ? page.levelColor(page.levelOf(page.nextLevel.price))
+                                   : Theme.secondaryHighlightColor
+                            font.pixelSize: Theme.fontSizeSmall
                         }
 
-                        Column {
-                            width: (parent.width - 2 * parent.spacing) / 3
-                            spacing: 2
-
-                            Label {
-                                text: qsTr("Ylin")
-                                color: Theme.secondaryHighlightColor
-                                font.pixelSize: Theme.fontSizeSmall
-                            }
-                            Row {
-                                spacing: Theme.paddingSmall
-
-                                Label {
-                                    id: maxValue
-                                    text: page.fmtPrice(priceFetcher.maxPrice)
-                                    color: Theme.highlightColor
-                                    font.pixelSize: Theme.fontSizeLarge
-                                    font.bold: true
-                                }
-                                Label {
-                                    anchors.baseline: maxValue.baseline
-                                    text: qsTr("snt/kWh")
-                                    color: Theme.secondaryColor
-                                    font.pixelSize: Theme.fontSizeExtraSmall
-                                }
-                            }
-                            Label {
-                                text: priceFetcher.maxTimeText
-                                color: Theme.secondaryColor
-                                font.pixelSize: Theme.fontSizeTiny
-                                visible: priceFetcher.maxTimeText !== ""
-                            }
+                        Label {
+                            visible: page.nextLevel !== null
+                            text: page.nextLevel !== null
+                                  ? qsTr("klo %1 · %2 snt/kWh")
+                                        .arg(Qt.formatDateTime(page.nextLevel.start, "HH:mm"))
+                                        .arg(page.fmtPrice(page.nextLevel.price))
+                                  : ""
+                            color: Theme.secondaryHighlightColor
+                            font.pixelSize: Theme.fontSizeSmall
                         }
                     }
                 }
             }
 
-            // Box 3: the chart fills the rest of the screen
-            Rectangle {
-                id: chartCard
-                x: Theme.horizontalPageMargin
-                width: parent.width - 2 * Theme.horizontalPageMargin
-                height: chartColumn.height + 2 * Theme.paddingLarge
-                radius: page.cardRadius
-                color: page.cardColor
+            // Section 2: min / average / max over the chart window
+            Column {
+                id: statsSection
+                width: parent.width
+                spacing: Theme.paddingMedium
                 visible: priceFetcher.hasData
+                height: visible ? implicitHeight : 0
 
-                Column {
-                    id: chartColumn
-                    x: Theme.paddingLarge
-                    width: parent.width - 2 * Theme.paddingLarge
-                    y: Theme.paddingLarge
-                    spacing: Theme.paddingSmall
+                Row {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    spacing: Theme.paddingLarge
 
-                    Label {
-                        id: chartCaption
-                        text: appSettings.resolution === 60
-                              ? qsTr("Tunnin keskiarvot c/kWh")
-                              : qsTr("Vartin hinnat c/kWh")
-                        color: Theme.secondaryHighlightColor
-                        font.pixelSize: Theme.fontSizeSmall
+                    Column {
+                        width: (parent.width - 2 * parent.spacing) / 3
+                        spacing: Theme.paddingSmall
+
+                        Label {
+                            text: qsTr("Alin")
+                            color: Theme.secondaryColor
+                            font.pixelSize: Theme.fontSizeSmall
+                        }
+                        Row {
+                            spacing: Theme.paddingSmall
+
+                            Label {
+                                id: minValue
+                                text: page.fmtPrice(priceFetcher.minPrice)
+                                color: Theme.highlightColor
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.bold: true
+                            }
+                            Label {
+                                anchors.baseline: minValue.baseline
+                                text: qsTr("snt/kWh")
+                                color: Theme.secondaryColor
+                                font.pixelSize: Theme.fontSizeExtraSmall
+                            }
+                        }
+                        Label {
+                            text: priceFetcher.minTimeText
+                            color: Theme.secondaryColor
+                            font.pixelSize: Theme.fontSizeTiny
+                            visible: priceFetcher.minTimeText !== ""
+                            height: visible ? implicitHeight : 0
+                        }
                     }
 
-                    PriceGraph {
-                        id: graph
-                        width: parent.width
-                        height: page.height
-                               - header.height
-                               - priceCard.height
-                               - statsCard.height
-                               - chartCaption.height
-                               - 3 * column.spacing
-                               - 5 * Theme.paddingLarge
-                        bars: priceFetcher.allBars
-                        nowIndex: priceFetcher.allNowIndex
-                        cheapThreshold: appSettings.cheapThreshold
-                        expensiveThreshold: appSettings.expensiveThreshold
-                        // Pass the index directly: graph.nowIndex may
-                        // not have re-evaluated yet when this fires
-                        onBarsChanged: scrollToNow(priceFetcher.allNowIndex)
+                    Column {
+                        width: (parent.width - 2 * parent.spacing) / 3
+                        spacing: Theme.paddingSmall
+
+                        Label {
+                            text: qsTr("Keskiarvo")
+                            color: Theme.secondaryColor
+                            font.pixelSize: Theme.fontSizeSmall
+                        }
+                        Row {
+                            spacing: Theme.paddingSmall
+
+                            Label {
+                                id: avgValue
+                                text: page.fmtPrice(priceFetcher.avgPrice)
+                                color: Theme.highlightColor
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.bold: true
+                            }
+                            Label {
+                                anchors.baseline: avgValue.baseline
+                                text: qsTr("snt/kWh")
+                                color: Theme.secondaryColor
+                                font.pixelSize: Theme.fontSizeExtraSmall
+                            }
+                        }
+                        Label {
+                            text: priceFetcher.windowSpanText
+                            color: Theme.secondaryColor
+                            font.pixelSize: Theme.fontSizeTiny
+                            visible: priceFetcher.windowSpanText !== ""
+                            height: visible ? implicitHeight : 0
+                        }
                     }
+
+                    Column {
+                        width: (parent.width - 2 * parent.spacing) / 3
+                        spacing: Theme.paddingSmall
+
+                        Label {
+                            text: qsTr("Ylin")
+                            color: Theme.secondaryColor
+                            font.pixelSize: Theme.fontSizeSmall
+                        }
+                        Row {
+                            spacing: Theme.paddingSmall
+
+                            Label {
+                                id: maxValue
+                                text: page.fmtPrice(priceFetcher.maxPrice)
+                                color: Theme.highlightColor
+                                font.pixelSize: Theme.fontSizeLarge
+                                font.bold: true
+                            }
+                            Label {
+                                anchors.baseline: maxValue.baseline
+                                text: qsTr("snt/kWh")
+                                color: Theme.secondaryColor
+                                font.pixelSize: Theme.fontSizeExtraSmall
+                            }
+                        }
+                        Label {
+                            text: priceFetcher.maxTimeText
+                            color: Theme.secondaryColor
+                            font.pixelSize: Theme.fontSizeTiny
+                            visible: priceFetcher.maxTimeText !== ""
+                            height: visible ? implicitHeight : 0
+                        }
+                    }
+                }
+            }
+
+            // Section 3: the chart fills the rest of the screen
+            Column {
+                id: chartColumn
+                width: parent.width
+                spacing: Theme.paddingSmall
+                visible: priceFetcher.hasData
+                height: visible ? implicitHeight : 0
+
+                SectionHeader {
+                    id: chartCaption
+                    text: appSettings.resolution === 60
+                        ? qsTr("Tunnin keskiarvot c/kWh")
+                        : qsTr("Vartin hinnat c/kWh")
+                }
+
+                PriceGraph {
+                    id: graph
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: page.height
+                           - header.height
+                           - levelSection.height
+                           - statsSection.height
+                           - chartCaption.height
+                           - 3 * column.spacing
+                           - 4 * Theme.paddingLarge
+                    bars: priceFetcher.allBars
+                    nowIndex: priceFetcher.allNowIndex
+                    cheapThreshold: appSettings.cheapThreshold
+                    expensiveThreshold: appSettings.expensiveThreshold
+                    // Pass the index directly: graph.nowIndex may
+                    // not have re-evaluated yet when this fires
+                    onBarsChanged: scrollToNow(priceFetcher.allNowIndex)
                 }
             }
         }
