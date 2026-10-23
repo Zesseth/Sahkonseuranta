@@ -104,11 +104,13 @@ Page {
                 height: visible ? implicitHeight : 0
             }
 
-            // Error text when there is no data to show
+            // Fetch error text. Also shown on top of stale data after a
+            // failed refresh: without it an airplane-mode "Päivitä" would
+            // silently leave the old prices looking current.
             Label {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
-                visible: !priceFetcher.hasData && !priceFetcher.loading && priceFetcher.errorString !== ""
+                visible: !priceFetcher.loading && priceFetcher.errorString !== ""
                 text: priceFetcher.errorString
                 color: Theme.errorColor
                 wrapMode: Text.WordWrap
