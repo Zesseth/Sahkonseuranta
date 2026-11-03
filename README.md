@@ -31,6 +31,9 @@ English. The app collects no user data - see
 - Stats row: average / min / max over the chart window (the same
   prices the graph shows)
 - Cover page showing the current price
+- **System notification when the price level changes** (Halpa /
+  Keskitaso / Kallis) via `Nemo.Notifications`, a Harbour-allowed API
+  that ships in the Jolla Store package
 - Optional **Events View widget** (Sailfish OS 5.x): the current
   price, level ball and level-change forecast on the home screen's
   Events View. The widget QML ships inside the Store package

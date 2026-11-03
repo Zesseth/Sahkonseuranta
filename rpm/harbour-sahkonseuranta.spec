@@ -9,7 +9,7 @@ Name:       harbour-sahkonseuranta
 # << macros
 
 Summary:    Electricity spot price tracking
-Version:    1.1.0
+Version:    1.2.0
 Release:    1
 Group:      Qt/Qt
 License:    AGPL-3.0-or-later
@@ -17,6 +17,7 @@ URL:        https://github.com/Zesseth/Sahkonseuranta
 Source0:    %{name}-%{version}.tar.bz2
 Source100:  harbour-sahkonseuranta.yaml
 Requires:   sailfishsilica-qt5 >= 0.10.9
+Requires:   nemo-qml-plugin-notifications-qt5
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Gui)
@@ -72,6 +73,10 @@ desktop-file-install --delete-original       \
 # << files
 
 %changelog
+* Sun Nov 08 2026 Zesseth <jlahtela@users.noreply.github.com> 1.2.0-1
+- System notification when the price level changes (Halpa/Keskitaso/Kallis)
+  via Nemo.Notifications - a Harbour-allowed API, so it ships in the Jolla
+  Store package unlike the Events View widget registration
 * Fri Oct 23 2026 Zesseth <jlahtela@users.noreply.github.com> 1.1.0-1
 - SailfishOS Events View widget (Sailfish OS 5.x): current spot price,
   level ball and level-change forecast on the home screen Events View

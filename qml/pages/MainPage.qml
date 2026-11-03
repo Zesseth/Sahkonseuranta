@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import QtQuick 2.6
 import Sailfish.Silica 1.0
+import Nemo.Notifications 1.0
 import "../components"
 import "../components/Levels.js" as Levels
 
@@ -8,6 +9,31 @@ Page {
     id: page
 
     Component.onCompleted: priceFetcher.refresh()
+
+    // Last price level a notification was published for; -1 = none yet.
+    // The first fetch only establishes the baseline, later level changes
+    // publish a system notification (allowed Harbour API, unlike the
+    // Events View widget registration).
+    property int lastNotifiedLevel: -1
+
+    function checkLevelChange() {
+        if (!priceFetcher.hasData)
+            return
+        var level = levelOf(priceFetcher.displayPrice)
+        if (level === lastNotifiedLevel)
+            return
+        var first = lastNotifiedLevel === -1
+        lastNotifiedLevel = level
+        if (first)
+            return
+        levelNotification.summary = qsTr("Hinnan taso vaihtui: %1").arg(page.levelName(level))
+        levelNotification.body = qsTr("Nykyinen hinta %1 snt/kWh on nyt %2 (kynnysarvot %3 / %4 snt/kWh).")
+            .arg(page.fmtPrice(priceFetcher.displayPrice))
+            .arg(page.levelName(level).toLowerCase())
+            .arg(page.fmtPrice(appSettings.cheapThreshold))
+            .arg(page.fmtPrice(appSettings.expensiveThreshold))
+        levelNotification.publish()
+    }
 
     function fmtPrice(v) {
         return v.toFixed(2).replace(".", ",")
@@ -70,6 +96,25 @@ Page {
         id: flick
         anchors.fill: parent
         contentHeight: column.height + Theme.paddingLarge
+
+        Connections {
+            target: priceFetcher
+            onBarsChanged: page.checkLevelChange()
+        }
+        Connections {
+            target: appSettings
+            onCheapThresholdChanged: page.checkLevelChange()
+            onExpensiveThresholdChanged: page.checkLevelChange()
+        }
+
+        Notification {
+            id: levelNotification
+            category: "x-nemo.transfer"
+            appName: "Sähkönseuranta"
+            appIcon: "image://theme/icon-m-notifications"
+            previewSummary: summary
+            previewBody: body
+        }
 
         PullDownMenu {
             MenuItem {

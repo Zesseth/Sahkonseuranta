@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# Static Jolla Store (Harbour) compliance gate. Runs on every push and PR.
+# Verifies QML imports and RPM Requires against the official
+# sdk-harbour-rpmvalidator allow-lists, and that no files are installed
+# outside the Harbour-allowed locations (the /usr/share/lipstick/ mistake
+# must never pass again).
+name: harbour-compliance
+
+on:
+  push:
+    branches: [main, 'vibe/**']
+  pull_request:
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: QML/imports/Requires/path compliance check
+        run: sh scripts/check-harbour-compliance.sh
+      - name: YAML + version consistency
+        run: |
+          python3 - <<'EOF'
+          import re, sys, yaml
+          y = yaml.safe_load(open('rpm/harbour-sahkonseuranta.yaml'))
+          spec = open('rpm/harbour-sahkonseuranta.spec').read()
+          cmake = open('CMakeLists.txt').read()
+          v_yaml = y['Version']
+          v_spec = re.search(r'^Version:\s*(\S+)', spec, re.M).group(1)
+          v_cmake = re.search(r'project\([^)]*?VERSION\s+(\S+)', cmake, re.S).group(1)
+          assert v_yaml == v_spec == v_cmake, (v_yaml, v_spec, v_cmake)
+          print(f"versions consistent: {v_yaml}")
+          EOF
