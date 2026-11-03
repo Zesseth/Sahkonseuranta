@@ -27,7 +27,7 @@ jobs:
           cmake = open('CMakeLists.txt').read()
           v_yaml = y['Version']
           v_spec = re.search(r'^Version:\s*(\S+)', spec, re.M).group(1)
-          v_cmake = re.search(r'VERSION\s+(\S+)', cmake).group(1)
+          v_cmake = re.search(r'project\([^)]*?VERSION\s+(\S+)', cmake, re.S).group(1)
           assert v_yaml == v_spec == v_cmake, (v_yaml, v_spec, v_cmake)
           print(f"versions consistent: {v_yaml}")
           EOF
